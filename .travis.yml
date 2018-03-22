@@ -1,0 +1,12 @@
+sudo: false
+language: java
+jdk:
+  - oraclejdk8
+
+script: "mvn clean verify"  
+
+after_success:
+  - mvn test javadoc:javadoc
+ 
+notifications:
+  email: false
