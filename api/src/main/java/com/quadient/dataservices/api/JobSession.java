@@ -8,7 +8,7 @@ public interface JobSession extends ServiceCaller, Closeable {
     
     void updateJobStatus(JobStatus status);
     
-    void close(FiniteJobStatus Status);
+    void close(FiniteJobStatus status);
     
     @Override
     default void close() {

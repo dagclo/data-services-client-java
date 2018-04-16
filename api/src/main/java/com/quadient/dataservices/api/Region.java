@@ -2,11 +2,11 @@ package com.quadient.dataservices.api;
 
 import java.net.URI;
 
-public enum Region {
+public enum Region implements HasBaseUri {
 
-    US("https://quadientcloud.com"),
+    US("https://data.quadientcloud.com"),
 
-    EU("https://quadientcloud.eu");
+    EU("https://data.quadientcloud.eu");
 
     private final URI baseUri;
 
@@ -14,6 +14,7 @@ public enum Region {
         this.baseUri = URI.create(baseUri);
     }
 
+    @Override
     public URI getBaseUri() {
         return baseUri;
     }

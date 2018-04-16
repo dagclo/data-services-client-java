@@ -5,7 +5,7 @@ import com.quadient.dataservices.api.Credentials;
 import com.quadient.dataservices.api.JobSession;
 import com.quadient.dataservices.api.Region;
 import com.quadient.dataservices.api.Response;
-import com.quadient.dataservices.api.UsernamePasswordCredentials;
+import com.quadient.dataservices.api.QuadientCloudCredentials;
 
 @SuppressWarnings({ "unused", "null" })
 public class ApiConsumerExample {
@@ -13,11 +13,11 @@ public class ApiConsumerExample {
     // this is not meant to be run, but just meant as a code sample to show API consuming code
     public void exampleWithoutAndWithJobSession() {
         final Credentials creds =
-                new UsernamePasswordCredentials(Region.US, "quadient", "johndoe", "secret".toCharArray());
+                new QuadientCloudCredentials(Region.US, "quadient", "johndoe", "secret".toCharArray());
         final Client client = null;
 
         final DummyRequest addrReq1 = new DummyRequest();
-        final Response<DummyResponse> addrResp1 = client.safeCall(addrReq1);
+        final Response<DummyResponse> addrResp1 = client.executeSafe(addrReq1);
         if (addrResp1.getStatusCode() == 200) {
             System.out.println("Got address correction response 1: " + addrResp1);
         }
@@ -25,7 +25,7 @@ public class ApiConsumerExample {
         final JobSession jobSession = client.createJob();
         try {
             final DummyRequest addrReq2 = new DummyRequest();
-            final DummyResponse addrResp2 = jobSession.call(addrReq2);
+            final DummyResponse addrResp2 = jobSession.execute(addrReq2);
             System.out.println("Got address correction response 2: " + addrResp2);
 
         } finally {
