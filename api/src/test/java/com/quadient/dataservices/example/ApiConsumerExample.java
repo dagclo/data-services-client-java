@@ -1,7 +1,11 @@
-package com.quadient.dataservices.api;
+package com.quadient.dataservices.example;
 
-import com.quadient.dataservices.address.AddressCorrectionRequest;
-import com.quadient.dataservices.address.AddressCorrectionResponse;
+import com.quadient.dataservices.api.Client;
+import com.quadient.dataservices.api.Credentials;
+import com.quadient.dataservices.api.JobSession;
+import com.quadient.dataservices.api.Region;
+import com.quadient.dataservices.api.Response;
+import com.quadient.dataservices.api.UsernamePasswordCredentials;
 
 @SuppressWarnings({ "unused", "null" })
 public class ApiConsumerExample {
@@ -12,16 +16,16 @@ public class ApiConsumerExample {
                 new UsernamePasswordCredentials(Region.US, "quadient", "johndoe", "secret".toCharArray());
         final Client client = null;
 
-        final AddressCorrectionRequest addrReq1 = new AddressCorrectionRequest();
-        final Response<AddressCorrectionResponse> addrResp1 = client.safeCall(addrReq1);
+        final DummyRequest addrReq1 = new DummyRequest();
+        final Response<DummyResponse> addrResp1 = client.safeCall(addrReq1);
         if (addrResp1.getStatusCode() == 200) {
             System.out.println("Got address correction response 1: " + addrResp1);
         }
 
         final JobSession jobSession = client.createJob();
         try {
-            final AddressCorrectionRequest addrReq2 = new AddressCorrectionRequest();
-            final AddressCorrectionResponse addrResp2 = jobSession.call(addrReq2);
+            final DummyRequest addrReq2 = new DummyRequest();
+            final DummyResponse addrResp2 = jobSession.call(addrReq2);
             System.out.println("Got address correction response 2: " + addrResp2);
 
         } finally {
