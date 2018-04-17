@@ -1,11 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.quadient.dataservices</groupId>
 	<artifactId>dataservices-client-parent</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	<inceptionYear>2018</inceptionYear>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,6 +29,25 @@
 		</profile>
 	</profiles>
 
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<organization>
+		<name>Quadient</name>
+		<url>https://www.quadient.com</url>
+	</organization>
+	<ciManagement>
+		<system>Travis CI</system>
+		<url>https://travis-ci.org/quadient/data-services-client-java</url>
+	</ciManagement>
+	<issueManagement>
+		<system>GitHub issues</system>
+		<url>https://github.com/quadient/data-services-client-java/issues</url>
+	</issueManagement>
 	<scm>
 		<url>https://github.com/quadient/data-services-client-java</url>
 		<connection>scm:git:git@github.com:quadient/data-services-client-java.git</connection>
