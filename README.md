@@ -32,18 +32,21 @@ Check out the `sample-app` folder for more comprehensive examples.
 Use the following dependency:
 
 ```
-		<dependency>
-			<groupId>com.quadient.dataservices</groupId>
-			<artifactId>dataservices-client-jersey</artifactId>
-		</dependency>
+<dependency>
+	<groupId>com.quadient.dataservices</groupId>
+	<artifactId>dataservices-client-jersey</artifactId>
+	<version>[version]</version>
+</dependency>
 ```
 
-In addition, you probably want to add the HK2 dependency which most Jersey clients prefer to use:
+Instead of `[version]`, put in the latest version from the [releases page](https://github.com/quadient/data-services-client-java/releases).
+
+In addition, you will probably want to add the HK2 dependency which most Jersey clients prefer to use:
 
 ```
-
-		<dependency>
-			<groupId>org.glassfish.jersey.inject</groupId>
-			<artifactId>jersey-hk2</artifactId>
-		</dependency>
+<dependency>
+	<groupId>org.glassfish.jersey.inject</groupId>
+	<artifactId>jersey-hk2</artifactId>
+	<version>2.27</version>
+</dependency>
 ```
