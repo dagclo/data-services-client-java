@@ -19,6 +19,11 @@ public class AddressCorrectionRequest implements Request<CorrectionResponse> {
         requestBody.setAddresses(addresses);
     }
 
+    public AddressCorrectionRequest(List<CorrectionRequestAddress> addresses) {
+        requestBody = new CorrectionRequest();
+        requestBody.setAddresses(addresses);
+    }
+
     public AddressCorrectionRequest(CorrectionRequest body) {
         this.requestBody = body;
     }
