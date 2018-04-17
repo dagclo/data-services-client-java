@@ -29,6 +29,18 @@
 				</configuration>
 				<executions>
 					<execution>
+						<id>generate-model-country</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<artifactId>dataservices-client-swagger-model-country</artifactId>
+							<inputSpec>https://data.quadientcloud.com/services/country-standardization/swagger.json</inputSpec>
+							<modelPackage>com.quadient.dataservices.country.model</modelPackage>
+							<invokerPackage>com.quadient.dataservices.country.invoker</invokerPackage>
+						</configuration>
+					</execution>
+					<execution>
 						<id>generate-model-address</id>
 						<goals>
 							<goal>generate</goal>
