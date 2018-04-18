@@ -7,8 +7,8 @@ public class HttpResponseExceptionImpl extends DataServicesException implements 
     private final int statusCode;
     private final String response;
 
-    public HttpResponseExceptionImpl(int statusCode, String response) {
-        super("HTTP " + statusCode + ":\n" + response);
+    public HttpResponseExceptionImpl(int statusCode, String reason, String response) {
+        super("HTTP " + statusCode + ": " + reason + (response != null && !response.isEmpty() ? "\n" + response : ""));
         this.statusCode = statusCode;
         this.response = response;
     }

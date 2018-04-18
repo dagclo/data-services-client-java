@@ -10,12 +10,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import com.quadient.dataservices.api.AccessTokenProvider;
 import com.quadient.dataservices.api.AdministrativeCredentials;
 import com.quadient.dataservices.api.Credentials;
 import com.quadient.dataservices.api.QuadientCloudCredentials;
 import com.quadient.dataservices.exceptions.AuthenticationException;
 
-public final class AccessTokenProvider {
+public final class AccessTokenProviderImpl implements AccessTokenProvider {
 
     // Default expiration is 10 minutes. To be conservative, renew every 8 minutes.
     private static final long TOKEN_EXPIRATION_MS = 8 * 60 * 1000;
@@ -54,7 +55,7 @@ public final class AccessTokenProvider {
         }
     }
 
-    public AccessTokenProvider(Credentials credentials, ClientBuilder clientBuilder) {
+    public AccessTokenProviderImpl(Credentials credentials, ClientBuilder clientBuilder) {
         validateCredentials(credentials);
         this.credentials = credentials;
         this.clientBuilder = clientBuilder;
@@ -105,7 +106,8 @@ public final class AccessTokenProvider {
                 token = authTokenResponse.getAccessToken();
                 break;
             default:
-                throw new AuthenticationException(response.getStatus(), response.readEntity(String.class));
+                throw new AuthenticationException(response.getStatus(), response.getStatusInfo().getReasonPhrase(),
+                        response.readEntity(String.class));
             }
             return token;
         } finally {
@@ -144,7 +146,8 @@ public final class AccessTokenProvider {
                 token = authTokenResponse.getToken();
                 break;
             default:
-                throw new AuthenticationException(response.getStatus(), response.readEntity(String.class));
+                throw new AuthenticationException(response.getStatus(), response.getStatusInfo().getReasonPhrase(),
+                        response.readEntity(String.class));
             }
             return token;
         } finally {
