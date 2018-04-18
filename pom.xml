@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.quadient.dataservices</groupId>
 	<artifactId>dataservices-client-parent</artifactId>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<inceptionYear>2018</inceptionYear>
 
@@ -52,7 +52,7 @@
 		<url>https://github.com/quadient/data-services-client-java</url>
 		<connection>scm:git:git@github.com:quadient/data-services-client-java.git</connection>
 		<developerConnection>scm:git:git@github.com:quadient/data-services-client-java.git</developerConnection>
-		<tag>dataservices-client-parent-0.1</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<build>
