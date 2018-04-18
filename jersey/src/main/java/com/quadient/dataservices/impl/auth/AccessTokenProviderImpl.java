@@ -43,6 +43,8 @@ public final class AccessTokenProviderImpl implements AccessTokenProvider {
             final AdministrativeCredentials administrativeCredentials = (AdministrativeCredentials) credentials;
             require("Username", administrativeCredentials.getUsername());
             require("Password", new String(administrativeCredentials.getPassword()));
+        } else if (credentials instanceof AccessTokenProvider) {
+            // nothing to validate
         } else {
             throw new UnsupportedOperationException(
                     "Unsupported credentials type: " + credentials.getClass().getName());
@@ -70,6 +72,8 @@ public final class AccessTokenProviderImpl implements AccessTokenProvider {
             } else if (credentials instanceof AdministrativeCredentials) {
                 final AdministrativeCredentials administrativeCredentials = (AdministrativeCredentials) credentials;
                 token = requestAccessToken(administrativeCredentials);
+            } else if (credentials instanceof AccessTokenProvider) {
+                token = ((AccessTokenProvider) credentials).getAccessToken();
             } else {
                 throw new UnsupportedOperationException(
                         "Unsupported credentials type: " + credentials.getClass().getName());
