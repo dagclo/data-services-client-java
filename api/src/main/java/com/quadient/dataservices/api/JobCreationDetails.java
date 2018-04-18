@@ -4,6 +4,7 @@ import java.util.Collection;
 
 public class JobCreationDetails {
 
+    private final String parentJobId;
     private final String origin;
     private final Collection<String> expectedServices;
     private final Integer expectedRecordCount;
@@ -13,6 +14,12 @@ public class JobCreationDetails {
     }
 
     public JobCreationDetails(String origin, Collection<String> expectedServices, Integer expectedRecordCount) {
+        this(null, origin, expectedServices, expectedRecordCount);
+    }
+
+    public JobCreationDetails(String parentJobId, String origin, Collection<String> expectedServices,
+            Integer expectedRecordCount) {
+        this.parentJobId = parentJobId == null || parentJobId.isEmpty() ? null : origin;
         this.origin = origin == null || origin.isEmpty() ? null : origin;
         this.expectedServices = expectedServices == null || expectedServices.isEmpty() ? null : expectedServices;
         this.expectedRecordCount = expectedRecordCount == null || expectedRecordCount == 0 ? null : expectedRecordCount;
@@ -30,4 +37,7 @@ public class JobCreationDetails {
         return expectedRecordCount;
     }
 
+    public String getParentJobId() {
+        return parentJobId;
+    }
 }

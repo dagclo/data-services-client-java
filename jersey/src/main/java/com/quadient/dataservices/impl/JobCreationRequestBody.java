@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.quadient.dataservices.api.JobCreationDetails;
 
 class JobCreationRequestBody {
+    
+    @JsonProperty("parent_job")
+    private String parentJob;
 
     @JsonProperty("origin")
     private String origin;
@@ -20,6 +23,7 @@ class JobCreationRequestBody {
         if (details == null) {
             details = new JobCreationDetails();
         }
+        this.parentJob = details.getParentJobId();
         this.origin = details.getOrigin();
         this.expectedServices = details.getExpectedServices();
         this.expectedRecordCount = details.getExpectedRecordCount();
@@ -47,5 +51,13 @@ class JobCreationRequestBody {
 
     public void setExpectedRecordCount(Integer expectedRecordCount) {
         this.expectedRecordCount = expectedRecordCount;
+    }
+    
+    public String getParentJob() {
+        return parentJob;
+    }
+    
+    public void setParentJob(String parentJob) {
+        this.parentJob = parentJob;
     }
 }
