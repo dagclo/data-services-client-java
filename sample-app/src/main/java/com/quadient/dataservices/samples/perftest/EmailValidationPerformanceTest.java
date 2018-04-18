@@ -60,6 +60,16 @@ public class EmailValidationPerformanceTest extends AbstractPerformanceTest {
     }
 
     @Override
+    protected Integer getExpectedRecordCount() {
+        return numRequests * numRecordsPerRequest;
+    }
+
+    @Override
+    protected String getServiceId() {
+        return "email-validation";
+    }
+
+    @Override
     protected Queue<Request<?>> createRequestQueue() {
         final ConcurrentLinkedQueue<Request<?>> queue = new ConcurrentLinkedQueue<>();
         for (int i = 0; i < numRequests; i++) {

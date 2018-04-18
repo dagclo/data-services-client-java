@@ -1,6 +1,9 @@
 package com.quadient.dataservices.samples.perftest;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -12,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.quadient.dataservices.api.Client;
 import com.quadient.dataservices.api.FiniteJobStatus;
+import com.quadient.dataservices.api.JobCreationDetails;
 import com.quadient.dataservices.api.JobSession;
 import com.quadient.dataservices.api.Request;
 import com.quadient.dataservices.api.ServiceCaller;
@@ -31,10 +35,14 @@ public abstract class AbstractPerformanceTest {
         this.numThreads = numThreads;
     }
 
+    protected abstract String getServiceId();
+
+    protected abstract Integer getExpectedRecordCount();
+
     public PerformanceTestState run() {
         final PerformanceTestState testState = new PerformanceTestState();
 
-        final JobSession job = client.createJob();
+        final JobSession job = createJob();
         try {
             final PerformanceTestThread[] threads = createThreads(job, testState);
             logger.info("{} threads created, starting job '{}'...", numThreads, job.getJobId());
@@ -58,6 +66,16 @@ public abstract class AbstractPerformanceTest {
             }
         }
         return testState;
+    }
+
+    private JobSession createJob() {
+        final String origin = "performance-test";
+        final Map<String, Object> additionalDetails = new HashMap<>();
+        additionalDetails.put("performance-test-class", getClass().getSimpleName());
+        final JobCreationDetails jobCreationDetails = new JobCreationDetails(null, origin,
+                Arrays.asList(getServiceId()), getExpectedRecordCount(), additionalDetails);
+        final JobSession job = client.createJob(jobCreationDetails);
+        return job;
     }
 
     private DescriptiveStatistics generateStats(final PerformanceTestThread[] threads) {
