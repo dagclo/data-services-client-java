@@ -26,6 +26,7 @@
 						<useBeanValidation>true</useBeanValidation>
 						<useJaxbAnnotations>true</useJaxbAnnotations>
 					</configOptions>
+					<templateDirectory>src/swagger-codegen-templates</templateDirectory>
 				</configuration>
 				<executions>
 					<execution>
