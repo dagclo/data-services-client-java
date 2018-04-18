@@ -1,5 +1,7 @@
 package com.quadient.dataservices.impl;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -66,7 +68,7 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
     }
 
     @Override
-    public <T> Response<T> executeSafe(Request<T> request) {
+    public <T> Response<T> executeSafe(Request<T> request) throws UncheckedIOException {
         final Response<T> response = fireRequest(request);
         return response;
     }
@@ -98,7 +100,21 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
                 requestBuilder.header(HEADER_AUTHORIZATION, "Bearer " + accessTokenProvider.getAccessToken());
             }
             interceptRequestBefore(requestBuilder);
-            response = requestBuilder.method(request.getMethod(), requestEntity);
+            
+            try {
+                response = requestBuilder.method(request.getMethod(), requestEntity);
+            } catch (UncheckedIOException e) {
+                throw e;
+            } catch (RuntimeException e) {
+                // catch unexpected exceptions, check if they're caused by IOExceptions, and if so, throw that (to be as
+                // specific as possible and conform with the advertised method signatures).
+                final Throwable cause = e.getCause();
+                if (cause instanceof IOException) {
+                    throw new UncheckedIOException((IOException) cause);
+                }
+                throw e;
+            }
+            
             final Headers responseHeaders = toImmutableHeaders(response.getStringHeaders());
 
             final int statusCode = response.getStatus();

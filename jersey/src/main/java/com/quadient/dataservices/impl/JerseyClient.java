@@ -34,6 +34,11 @@ public class JerseyClient extends JerseyServiceCaller implements Client {
     public JobSession createJob() {
         return createJob(new JobCreationDetails());
     }
+    
+    @Override
+    public JobSession resumeJob(String jobId) {
+        return new JerseyJobSession(getClientBuilder(), getAccessTokenProvider(), getBaseUri(), jobId);
+    }
 
     @Override
     public JobSession createJob(JobCreationDetails jobRequestDetails) {

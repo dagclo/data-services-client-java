@@ -1,5 +1,7 @@
 package com.quadient.dataservices.api;
 
+import java.io.UncheckedIOException;
+
 import com.quadient.dataservices.exceptions.DataServicesException;
 
 /**
@@ -7,9 +9,24 @@ import com.quadient.dataservices.exceptions.DataServicesException;
  */
 public interface ServiceCaller {
 
-    <T> Response<T> executeSafe(Request<T> request);
+    /**
+     * Executes a Data Services request and returns it's HTTP response.
+     * 
+     * @param request
+     * @return
+     * @throws UncheckedIOException
+     */
+    <T> Response<T> executeSafe(Request<T> request) throws UncheckedIOException;
 
-    default <T> T execute(Request<T> request) throws DataServicesException {
+    /**
+     * Executes a Data Services request and returns it's expected response model.
+     * 
+     * @param request
+     * @return
+     * @throws DataServicesException
+     * @throws UncheckedIOException
+     */
+    default <T> T execute(Request<T> request) throws DataServicesException, UncheckedIOException {
         return executeSafe(request).getBody();
     }
 }
