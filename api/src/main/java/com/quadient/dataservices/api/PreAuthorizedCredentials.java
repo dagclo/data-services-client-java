@@ -10,7 +10,7 @@ import java.util.Objects;
  * Note that this implementation cannot re-generate an access token, so consequently it will only last as long as the
  * access token hasn't expired.
  */
-public class PreAuthorizedCredentials implements HasBaseUri, AccessTokenProvider {
+public class PreAuthorizedCredentials implements HasBaseUri, AccessTokenProvider, Credentials {
 
     private final URI baseUri;
     private final String accessToken;
