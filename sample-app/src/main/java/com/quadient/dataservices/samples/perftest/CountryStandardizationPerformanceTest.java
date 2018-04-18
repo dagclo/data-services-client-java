@@ -16,6 +16,9 @@ import com.quadient.dataservices.api.Request;
 import com.quadient.dataservices.country.CountryStandardizationRequest;
 import com.quadient.dataservices.samples.utils.CommandLineArgs;
 
+/**
+ * Performance test class that uses Country standardization.
+ */
 public class CountryStandardizationPerformanceTest extends AbstractPerformanceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CountryStandardizationPerformanceTest.class);

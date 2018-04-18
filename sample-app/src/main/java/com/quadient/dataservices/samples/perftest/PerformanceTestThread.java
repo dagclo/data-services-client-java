@@ -33,7 +33,7 @@ public class PerformanceTestThread extends Thread {
     @Override
     public void run() {
         final Stopwatch stopwatch = Stopwatch.createUnstarted();
-        int requestNo = 0;
+        int threadRequestCounter = 0;
         while (!testState.isCancelled()) {
             final Request<?> req = requestSupplier.get();
             if (req == null) {
@@ -41,19 +41,19 @@ public class PerformanceTestThread extends Thread {
                 break;
             }
 
-            requestNo++;
-            
-            final String requestNoStr = String.format("%04d", requestNo);
+            threadRequestCounter++;
 
-            logger.debug("Req {} - Sending", requestNoStr);
-            logger.trace("Req {} - Request body:\n{}", requestNoStr, req);
+            final String requestId = testState.getNextRequestId();
+
+            logger.debug("Req {} - Sending", requestId);
+            logger.trace("Req {} - Request body:\n{}", requestId, req);
             stopwatch.start();
             final Object resp;
             try {
                 resp = serviceCaller.execute(req);
             } catch (RuntimeException e) {
                 final long millis = stopwatch.elapsed(TimeUnit.MILLISECONDS);
-                logger.error("Req {} - Exception after {} ms", requestNoStr, millis, e);
+                logger.error("Req {} - Exception after {} ms", requestId, millis, e);
                 testState.onException(e);
                 break;
             }
@@ -61,11 +61,11 @@ public class PerformanceTestThread extends Thread {
             final long millis = stopwatch.elapsed(TimeUnit.MILLISECONDS);
             stopwatch.reset();
             requestTimings.add(millis);
-            logger.info("Req {} - Received after {} ms", requestNoStr, millis);
-            logger.trace("Req {} - Response body:\n{}", requestNoStr, resp);
+            logger.info("Req {} - Received after {} ms", requestId, millis);
+            logger.trace("Req {} - Response body:\n{}", requestId, resp);
         }
-        
-        final String requestNoStr = String.format("%04d", requestNo);
+
+        final String requestNoStr = String.format("%04d", threadRequestCounter);
         logger.info("Done. Processed {} requests.", requestNoStr);
     }
 
