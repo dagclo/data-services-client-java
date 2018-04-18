@@ -5,6 +5,9 @@
 	<version>0.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<inceptionYear>2018</inceptionYear>
+	<name>Quadient Data Services Client for Java</name>
+	<description>Java client package for Quadient Data Services</description>
+	<url>https://github.com/quadient/data-services-client-java</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,6 +43,17 @@
 		<name>Quadient</name>
 		<url>https://www.quadient.com</url>
 	</organization>
+	<developers>
+		<developer>
+			<name>Kasper Sørensen</name>
+		</developer>
+		<developer>
+			<name>Andrew Miller</name>
+		</developer>
+		<developer>
+			<name>Randy Larson</name>
+		</developer>
+	</developers>
 	<ciManagement>
 		<system>Travis CI</system>
 		<url>https://travis-ci.org/quadient/data-services-client-java</url>
