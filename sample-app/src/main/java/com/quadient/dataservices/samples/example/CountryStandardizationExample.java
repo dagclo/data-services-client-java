@@ -1,37 +1,17 @@
-package com.quadient.dataservices.sample;
-
-import java.net.URI;
+package com.quadient.dataservices.samples.example;
 
 import com.quadient.dataservices.ClientFactory;
-import com.quadient.dataservices.api.AdministrativeCredentials;
 import com.quadient.dataservices.api.Client;
 import com.quadient.dataservices.api.Credentials;
-import com.quadient.dataservices.api.HasBaseUri;
 import com.quadient.dataservices.api.JobSession;
-import com.quadient.dataservices.api.QuadientCloudCredentials;
-import com.quadient.dataservices.api.Region;
 import com.quadient.dataservices.country.CountryStandardizationRequest;
 import com.quadient.dataservices.country.model.CountryStandardizationResponse;
+import com.quadient.dataservices.samples.utils.CommandLineArgs;
 
-public class Main {
+public class CountryStandardizationExample {
 
     public static void main(String[] args) throws Exception {
-        final Credentials credentials;
-        if (args.length == 4) {
-            final HasBaseUri region = getRegion(args[0]);
-            final String company = args[1];
-            final String username = args[2];
-            final String password = args[3];
-            credentials = new QuadientCloudCredentials(region.getBaseUri(), company, username, password.toCharArray());
-        } else if (args.length == 3) {
-            final HasBaseUri region = getRegion(args[0]);
-            final String username = args[1];
-            final String password = args[2];
-            credentials = new AdministrativeCredentials(region.getBaseUri(), username, password.toCharArray());
-        } else {
-            throw new IllegalArgumentException(
-                    "Please provide the following 4 command line args: <region> <company> <username> <password>");
-        }
+        final Credentials credentials = CommandLineArgs.getCredentials(args);
 
         final Client client = ClientFactory.createClient(credentials);
 
@@ -54,9 +34,5 @@ public class Main {
 
         job.close();
         System.out.println("Finished job: " + job.getJobId());
-    }
-
-    public static HasBaseUri getRegion(String argument) {
-        return argument.length() == 2 ? Region.valueOf(argument) : () -> URI.create(argument);
     }
 }
