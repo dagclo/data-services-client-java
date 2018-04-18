@@ -28,11 +28,12 @@ public class CountryStandardizationPerformanceTest extends AbstractPerformanceTe
         final Client client = ClientFactory.createClient(credentials);
 
         final int numThreads = 6;
+        final boolean createJob = true;
         final int numRequests = 500;
         final int numRecordsPerRequest = 50;
 
         final CountryStandardizationPerformanceTest perfTest =
-                new CountryStandardizationPerformanceTest(client, numThreads, numRequests, numRecordsPerRequest);
+                new CountryStandardizationPerformanceTest(client, numThreads, createJob, numRequests, numRecordsPerRequest);
         final PerformanceTestState testState = perfTest.run();
 
         if (testState.isCancelled()) {
@@ -46,9 +47,9 @@ public class CountryStandardizationPerformanceTest extends AbstractPerformanceTe
     private final int numRequests;
     private final int numRecordsPerRequest;
 
-    public CountryStandardizationPerformanceTest(Client client, int numThreads, int numRequests,
+    public CountryStandardizationPerformanceTest(Client client, int numThreads, boolean createJob, int numRequests,
             int numRecordsPerRequest) {
-        super(client, numThreads);
+        super(client, numThreads, createJob);
         this.numRequests = numRequests;
         this.numRecordsPerRequest = numRecordsPerRequest;
     }

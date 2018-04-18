@@ -5,6 +5,7 @@ import java.net.URI;
 import com.quadient.dataservices.api.AdministrativeCredentials;
 import com.quadient.dataservices.api.Credentials;
 import com.quadient.dataservices.api.HasBaseUri;
+import com.quadient.dataservices.api.PreAuthorizedCredentials;
 import com.quadient.dataservices.api.QuadientCloudCredentials;
 import com.quadient.dataservices.api.Region;
 
@@ -22,6 +23,8 @@ public class CommandLineArgs {
             final String username = args[1];
             final String password = args[2];
             return new AdministrativeCredentials(region.getBaseUri(), username, password.toCharArray());
+        } else if (args.length == 2) {
+            return new PreAuthorizedCredentials(URI.create(args[0]), args[1]);
         } else {
             throw new IllegalArgumentException(
                     "Please provide the following 4 command line args: <region> <company> <username> <password>");

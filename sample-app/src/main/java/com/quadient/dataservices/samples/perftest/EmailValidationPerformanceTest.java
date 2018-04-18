@@ -30,13 +30,14 @@ public class EmailValidationPerformanceTest extends AbstractPerformanceTest {
         final Credentials credentials = CommandLineArgs.getCredentials(args);
         final Client client = ClientFactory.createClient(credentials);
 
-        final int numThreads = 2;
-        final int numRequests = 40;
-        final int numRecordsPerRequest = 20;
+        final int numThreads = 4;
+        final boolean createJob = true;
+        final int numRequests = 100;
+        final int numRecordsPerRequest = 50;
         final ProcessingStyleEnum processingStyle = ProcessingStyleEnum.FAST;
 
         final EmailValidationPerformanceTest perfTest = new EmailValidationPerformanceTest(client, numThreads,
-                numRequests, numRecordsPerRequest, processingStyle);
+                createJob, numRequests, numRecordsPerRequest, processingStyle);
         final PerformanceTestState testState = perfTest.run();
 
         if (testState.isCancelled()) {
@@ -51,9 +52,9 @@ public class EmailValidationPerformanceTest extends AbstractPerformanceTest {
     private final int numRecordsPerRequest;
     private final ProcessingStyleEnum processingStyle;
 
-    public EmailValidationPerformanceTest(Client client, int numThreads, int numRequests, int numRecordsPerRequest,
-            ProcessingStyleEnum processingStyle) {
-        super(client, numThreads);
+    public EmailValidationPerformanceTest(Client client, int numThreads, boolean createJob, int numRequests,
+            int numRecordsPerRequest, ProcessingStyleEnum processingStyle) {
+        super(client, numThreads, createJob);
         this.numRequests = numRequests;
         this.numRecordsPerRequest = numRecordsPerRequest;
         this.processingStyle = processingStyle;
