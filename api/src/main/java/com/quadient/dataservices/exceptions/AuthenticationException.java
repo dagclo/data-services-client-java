@@ -7,7 +7,7 @@ public class AuthenticationException extends HttpResponseExceptionImpl {
 
     private static final long serialVersionUID = 1L;
 
-    public AuthenticationException(int statusCode, String response) {
-        super(statusCode, response);
+    public AuthenticationException(int statusCode, String reason, String response) {
+        super(statusCode, reason, response);
     }
 }
