@@ -35,7 +35,8 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
 
     private static final Logger logger = LoggerFactory.getLogger(JerseyServiceCaller.class);
 
-    private static final int RETRY_STOP_AFTER_ATTEMPT = 3;
+    private static final int RETRY_STOP_AFTER_ATTEMPT = 5;
+    private static final int[] RETRY_WAIT_ON_429 = new int[] { 500, 1500, 5000, 10000, 20000 };
 
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private static final String HEADER_AUTHORIZATION = "Authorization";
@@ -128,20 +129,25 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
                         // Service temporarily unavailable (wait x seconds)
                         sleep(attemptNo * 2000);
                     case 429:
-                        // Client is too busy/throttling the service (penalize sub-second by waiting)
-                        sleep(attemptNo * 500);
+                        // Client is too busy/throttling the service
+                        // (penalize sub-second with exponential backoff by waiting)
+                        sleep(RETRY_WAIT_ON_429[attemptNo - 1]);
                     case 502:
                         // Bad gateway (rare, but could be a very short-lived issue, retry)
-                        sleep(attemptNo * 200);
-
-                        // the following
-                        logger.warn("Failed with HTTP {}, but retrying. Response: {}", statusCode, responseString);
+                        sleep(attemptNo * 180);
+                    case 500:
+                        sleep(attemptNo * 20);
+                        logger.warn("Failed with HTTP {} (attempt no. {}), but retrying. Response: {}", statusCode,
+                                attemptNo, responseString);
                         return fireRequestInternal(request, attemptNo + 1);
                     default:
-                        return new FailedResponse<T>(statusCode, response.getStatusInfo().getReasonPhrase(),
-                                responseHeaders, responseString);
+                        logger.warn(
+                                "Failed with HTTP {} (attempt no. {}). No retry-logic defined for this HTTP code. Response: {}",
+                                statusCode, attemptNo, responseString);
                     }
                 }
+                return new FailedResponse<T>(statusCode, response.getStatusInfo().getReasonPhrase(), responseHeaders,
+                        responseString);
             }
 
             final Class<T> responseBodyClass = request.getResponseBodyClass();
@@ -150,7 +156,12 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
                 final T responseBody = response.readEntity(responseBodyClass);
                 return new SuccessfulResponse<T>(statusCode, responseHeaders, responseBody);
             } catch (Exception e) {
-                final String responseString = response.readEntity(String.class);
+                String responseString = null;
+                try {
+                    responseString = response.readEntity(String.class);
+                } catch (Exception e2) {
+                    logger.warn("Failed to re-read failed response entity as a string: {}", e2.getMessage());
+                }
                 return new FailedResponse<T>(statusCode, response.getStatusInfo().getReasonPhrase(), responseHeaders,
                         responseString, e);
             } finally {
