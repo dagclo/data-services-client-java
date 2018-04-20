@@ -14,7 +14,7 @@ public class CountryStandardizationExample {
         final Credentials credentials = CommandLineArgs.getCredentials(args);
 
         final Client client = ClientFactory.createClient(credentials);
-
+        
         CountryStandardizationResponse response;
 
         // call country standardization without a job session
@@ -27,7 +27,7 @@ public class CountryStandardizationExample {
         final JobSession job = client.createJob();
         System.out.println("Created job: " + job.getJobId());
 
-        response = client.execute(new CountryStandardizationRequest("Danmark", "Holland"));
+        response = job.execute(new CountryStandardizationRequest("Danmark", "Holland"));
         response.getCountries().forEach(c -> {
             System.out.println("Got response country: " + c.getCountry().getIso2());
         });
