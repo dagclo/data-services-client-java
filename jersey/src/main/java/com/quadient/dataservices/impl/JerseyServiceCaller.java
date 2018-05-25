@@ -29,6 +29,8 @@ import com.quadient.dataservices.api.Request;
 import com.quadient.dataservices.api.Response;
 import com.quadient.dataservices.api.ServiceCaller;
 import com.quadient.dataservices.api.SuccessfulResponse;
+import com.quadient.dataservices.exceptions.CreditBalanceException;
+import com.quadient.dataservices.exceptions.RequestTooLargeException;
 import com.quadient.dataservices.impl.auth.AccessTokenProviderImpl;
 
 abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider {
@@ -107,7 +109,8 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
             } catch (UncheckedIOException e) {
                 throw e;
             } catch (RuntimeException e) {
-                // catch unexpected exceptions, check if they're caused by IOExceptions, and if so, throw that (to be as
+                // catch unexpected exceptions, check if they're caused by IOExceptions, and if
+                // so, throw that (to be as
                 // specific as possible and conform with the advertised method signatures).
                 final Throwable cause = e.getCause();
                 if (cause instanceof IOException) {
@@ -136,10 +139,20 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
                         // Bad gateway (rare, but could be a very short-lived issue, retry)
                         sleep(attemptNo * 180);
                     case 500:
+                    case 504:
                         sleep(attemptNo * 20);
                         logger.warn("Failed with HTTP {} (attempt no. {}), but retrying. Response: {}", statusCode,
                                 attemptNo, responseString);
                         return fireRequestInternal(request, attemptNo + 1);
+                    case 413:
+                        throw new RequestTooLargeException(statusCode, response.getStatusInfo().getReasonPhrase(),
+                                responseString);
+                    case 403:
+                        // check for out-of-credits scenario
+                        if (responseString.toLowerCase().contains("credit balance")) {
+                            throw new CreditBalanceException(statusCode, response.getStatusInfo().getReasonPhrase(),
+                                    responseString);
+                        }
                     default:
                         logger.warn(
                                 "Failed with HTTP {} (attempt no. {}). No retry-logic defined for this HTTP code. Response: {}",
