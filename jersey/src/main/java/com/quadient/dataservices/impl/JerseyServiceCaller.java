@@ -139,6 +139,7 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
                         // Bad gateway (rare, but could be a very short-lived issue, retry)
                         sleep(attemptNo * 180);
                     case 500:
+                    case 504:
                         sleep(attemptNo * 20);
                         logger.warn("Failed with HTTP {} (attempt no. {}), but retrying. Response: {}", statusCode,
                                 attemptNo, responseString);
