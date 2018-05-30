@@ -35,7 +35,7 @@ public class NameValidationParseRequest implements Request<ParseResponse> {
 
     @Override
     public String getPath() {
-        return "/services/name-validation/v1/parse";
+        return "/services/name-validation/v2/parse";
     }
 
     @Override
