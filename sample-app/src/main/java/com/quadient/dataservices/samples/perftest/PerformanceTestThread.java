@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Stopwatch;
 import com.quadient.dataservices.api.Request;
 import com.quadient.dataservices.api.ServiceCaller;
@@ -63,6 +64,16 @@ public class PerformanceTestThread extends Thread {
             requestTimings.add(millis);
             logger.info("Req {} - Received after {} ms", requestId, millis);
             logger.trace("Req {} - Response body:\n{}", requestId, resp);
+
+            if (threadRequestCounter == 1 && logger.isInfoEnabled()) {
+                // log a sample response for manual validation
+                try {
+                    final String respAsString = new ObjectMapper().writeValueAsString(resp);
+                    logger.info("First response (sample): {}", respAsString);
+                } catch (Exception e) {
+                    logger.error("Failed to json-encode response for verification: {}", e.getMessage());
+                }
+            }
         }
 
         final String requestNoStr = String.format("%04d", threadRequestCounter);
