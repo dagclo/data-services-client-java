@@ -6,6 +6,11 @@
 		<version>0.9-SNAPSHOT</version>
 	</parent>
 	<artifactId>dataservices-client-swagger-model</artifactId>
+	
+	<properties>
+		<swagger.baseurl>https://data.quadientcloud.com</swagger.baseurl>
+	</properties>
+	
 	<packaging>jar</packaging>
 
 	<build>
@@ -34,7 +39,7 @@
 						</goals>
 						<configuration>
 							<artifactId>dataservices-client-swagger-model-country</artifactId>
-							<inputSpec>https://data.quadientcloud.com/services/country-standardization/swagger.json</inputSpec>
+							<inputSpec>${swagger.baseurl}/services/country-standardization/swagger.json</inputSpec>
 							<modelPackage>com.quadient.dataservices.country.model</modelPackage>
 							<invokerPackage>com.quadient.dataservices.country.invoker</invokerPackage>
 						</configuration>
@@ -46,7 +51,7 @@
 						</goals>
 						<configuration>
 							<artifactId>dataservices-client-swagger-model-address</artifactId>
-							<inputSpec>https://data.quadientcloud.com/services/address-correction/swagger.json</inputSpec>
+							<inputSpec>${swagger.baseurl}/services/address-correction/swagger.json</inputSpec>
 							<modelPackage>com.quadient.dataservices.address.model</modelPackage>
 							<invokerPackage>com.quadient.dataservices.address.invoker</invokerPackage>
 						</configuration>
@@ -58,7 +63,7 @@
 						</goals>
 						<configuration>
 							<artifactId>dataservices-client-swagger-model-name</artifactId>
-							<inputSpec>https://data.quadientcloud.com/services/name-validation/swagger.json</inputSpec>
+							<inputSpec>${swagger.baseurl}/services/name-validation/swagger.json</inputSpec>
 							<modelPackage>com.quadient.dataservices.name.model</modelPackage>
 							<invokerPackage>com.quadient.dataservices.name.invoker</invokerPackage>
 						</configuration>
@@ -70,7 +75,7 @@
 						</goals>
 						<configuration>
 							<artifactId>dataservices-client-swagger-model-email</artifactId>
-							<inputSpec>https://data.quadientcloud.com/services/email-validation/swagger.json</inputSpec>
+							<inputSpec>${swagger.baseurl}/services/email-validation/swagger.json</inputSpec>
 							<modelPackage>com.quadient.dataservices.email.model</modelPackage>
 							<invokerPackage>com.quadient.dataservices.email.invoker</invokerPackage>
 						</configuration>
@@ -82,9 +87,33 @@
 						</goals>
 						<configuration>
 							<artifactId>dataservices-client-swagger-model-phone</artifactId>
-							<inputSpec>https://data.quadientcloud.com/services/phone-validation/swagger.json</inputSpec>
+							<inputSpec>${swagger.baseurl}/services/phone-validation/swagger.json</inputSpec>
 							<modelPackage>com.quadient.dataservices.phone.model</modelPackage>
 							<invokerPackage>com.quadient.dataservices.phone.invoker</invokerPackage>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-model-universal-parser</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<artifactId>dataservices-client-swagger-model-universal.parser</artifactId>
+							<inputSpec>${swagger.baseurl}/services/universal-parser/swagger.json</inputSpec>
+							<modelPackage>com.quadient.dataservices.universalparser.model</modelPackage>
+							<invokerPackage>com.quadient.dataservices.universalparser.invoker</invokerPackage>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-model-sentiment-analysis</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<artifactId>dataservices-client-swagger-model-sentiment-analysis</artifactId>
+							<inputSpec>${swagger.baseurl}/services/sentiment-analysis/swagger.json</inputSpec>
+							<modelPackage>com.quadient.dataservices.sentimentanalysis.model</modelPackage>
+							<invokerPackage>com.quadient.dataservices.sentimentanalysis.invoker</invokerPackage>
 						</configuration>
 					</execution>
 				</executions>

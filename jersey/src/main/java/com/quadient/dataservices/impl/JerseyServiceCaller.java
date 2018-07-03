@@ -141,8 +141,8 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
                     case 500:
                     case 504:
                         sleep(attemptNo * 20);
-                        logger.warn("Failed with HTTP {} (attempt no. {}), but retrying. Response: {}", statusCode,
-                                attemptNo, responseString);
+                        logger.warn("{} {} failed with HTTP {} (attempt no. {}), but retrying. Response: {}",
+                                request.getMethod(), request.getPath(), statusCode, attemptNo, responseString);
                         return fireRequestInternal(request, attemptNo + 1);
                     case 413:
                         throw new RequestTooLargeException(statusCode, response.getStatusInfo().getReasonPhrase(),
@@ -155,8 +155,8 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
                         }
                     default:
                         logger.warn(
-                                "Failed with HTTP {} (attempt no. {}). No retry-logic defined for this HTTP code. Response: {}",
-                                statusCode, attemptNo, responseString);
+                                "{} {} failed with HTTP {} (attempt no. {}). No retry-logic defined for this HTTP code. Response: {}",
+                                request.getMethod(), request.getPath(), statusCode, attemptNo, responseString);
                     }
                 }
                 return new FailedResponse<T>(statusCode, response.getStatusInfo().getReasonPhrase(), responseHeaders,
@@ -173,7 +173,9 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
                 try {
                     responseString = response.readEntity(String.class);
                 } catch (Exception e2) {
-                    logger.warn("Failed to re-read failed response entity as a string: {}", e2.getMessage());
+                    logger.warn("{} {} failed to re-read failed response entity as a string: {}",
+                            request.getMethod(), request.getPath(),
+                            e2.getMessage());
                 }
                 return new FailedResponse<T>(statusCode, response.getStatusInfo().getReasonPhrase(), responseHeaders,
                         responseString, e);
