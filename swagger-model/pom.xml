@@ -63,7 +63,7 @@
 						</goals>
 						<configuration>
 							<artifactId>dataservices-client-swagger-model-name</artifactId>
-							<inputSpec>${swagger.baseurl}/services/name-validation/swagger.json</inputSpec>
+							<inputSpec>name-validation-swagger.json</inputSpec>
 							<modelPackage>com.quadient.dataservices.name.model</modelPackage>
 							<invokerPackage>com.quadient.dataservices.name.invoker</invokerPackage>
 						</configuration>
