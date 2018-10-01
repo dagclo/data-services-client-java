@@ -6,9 +6,9 @@ import com.quadient.dataservices.api.Request;
 import com.quadient.dataservices.email.model.EmailAddress;
 import com.quadient.dataservices.email.model.EmailValidationRequestConfiguration;
 import com.quadient.dataservices.email.model.EmailValidationRequestConfiguration.ProcessingStyleEnum;
-import com.quadient.dataservices.phone.model.PhoneValidationResponse;
+import com.quadient.dataservices.email.model.EmailValidationResponse;
 
-public class EmailValidationRequest implements Request<PhoneValidationResponse> {
+public class EmailValidationRequest implements Request<EmailValidationResponse> {
 
     final com.quadient.dataservices.email.model.EmailValidationRequest requestBody;
 
@@ -26,8 +26,8 @@ public class EmailValidationRequest implements Request<PhoneValidationResponse> 
     }
 
     @Override
-    public Class<PhoneValidationResponse> getResponseBodyClass() {
-        return PhoneValidationResponse.class;
+    public Class<EmailValidationResponse> getResponseBodyClass() {
+        return EmailValidationResponse.class;
     }
 
     @Override
