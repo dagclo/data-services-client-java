@@ -116,6 +116,18 @@
 							<invokerPackage>com.quadient.dataservices.sentimentanalysis.invoker</invokerPackage>
 						</configuration>
 					</execution>
+					<execution>
+						<id>generate-model-sanction-lists</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<artifactId>dataservices-client-swagger-model-sanction</artifactId>
+							<inputSpec>${project.basedir}/sanction-lists-swagger.yaml</inputSpec>
+							<modelPackage>com.quadient.dataservices.sanctionlists.model</modelPackage>
+							<invokerPackage>com.quadient.dataservices.sanctionlists.invoker</invokerPackage>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>

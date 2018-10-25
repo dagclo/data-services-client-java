@@ -1,0 +1,465 @@
+swagger: '2.0'
+info:
+  version: "1.0"
+  title: Sanction List check
+  description: |
+    All companies have a need to understand and know their customers. Around the world, 
+    governments have established requirements for companies doing business within their 
+    borders to validate and enforce that the individuals and companies they deal with
+    are not fraudulent. The Quadient Sanction List Check data service helps you do this
+    due diligence. It gathers those requirements in one place so you can build the vetting
+    and approval of potential customers into your daily business workflow. 
+    
+    Use the Quadient Cloud Sanction List Check service as part of your customer onboarding process 
+    to match the name of a person, group, or entity against sanction lists. The service is 
+    updated weekly to ensure that newly sanctioned people or organizations are found. 
+    The following supported lists include:
+
+    
+    * Europe:  European External Action Service (EEAS) 
+    (https://eeas.europa.eu/headquarters/headquarters-homepage_en/8442/Consolidated%20list%20of%20sanctions)
+    * United States: US Office of Foreign Asset Control (OFAC) 
+    (https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx)
+    
+     ## Key functionality:
+    
+    * For a name, provides a list of potential matches, sorted by match score, to allow 
+    reviewing whether a partial match should be considered.
+    * Considers name aliases (for example, nicknames) and multiples of documents related to a person's birth information, 
+    citizenship status, ID documents, and so forth.
+    
+paths:
+  /v1/match:
+    post:
+      summary: Match records
+      description: Matches records against sanction lists.
+      parameters:
+        - in: header
+          name: Job-ID
+          description: Identifies the Job that pertains to this request.
+          required: !!bool false
+          type: string
+        - in: body
+          name: body
+          required: !!bool true
+          schema:
+            $ref: "#/definitions/MatchRequest"
+      responses:
+        200:
+          description: Successful response.
+          schema:
+            $ref: "#/definitions/MatchResponse"
+        400:
+          description: Request is invalid because a required element is missing or empty.
+          schema:
+            $ref: '#/definitions/error'
+definitions:
+  MatchRequest:
+    type: object
+    properties:
+      configuration:
+        $ref: '#/definitions/MatchRequestConfiguration'
+      records:
+        type: array
+        minItems: 1
+        maxItems: 500
+        items:
+          $ref: '#/definitions/MatchRequestRecord'
+  MatchRequestConfiguration:
+    type: object
+    properties:
+      source_lists:
+        type: array
+        description: Selection of sanction lists to match against.
+        default:
+        - EU_EEAS
+        - US_OFAC
+        items:
+          $ref: '#/definitions/SourceList'
+  MatchRequestRecord:
+    type: object
+    properties:
+      id:
+        type: string
+        description: User-specified reference ID or name for the entity.
+        example: qh7ALPQb
+      entity_type:
+        $ref: '#/definitions/EntityType'
+      names:
+        type: array
+        minItems: 1
+        maxItems: 4
+        items:
+          $ref: '#/definitions/MatchRequestName'
+      addresses:
+        type: array
+        minItems: 0
+        maxItems: 4
+        items:
+          $ref: '#/definitions/MatchRequestAddress'
+      phone_numbers:
+        type: array
+        minItems: 0
+        maxItems: 4
+        items:
+          type: string
+      email_addresses:
+        type: array
+        minItems: 0
+        maxItems: 4
+        items:
+          type: string
+      citizenships:
+        type: array
+        minItems: 0
+        maxItems: 4
+        items:
+          $ref: '#/definitions/MatchRequestCitizenship'
+      id_documents:
+        type: array
+        minItems: 0
+        maxItems: 10
+        items:
+          $ref: '#/definitions/MatchRequestIdDocument'
+      birth_information:
+        $ref: '#/definitions/MatchRequestBirthInformation'
+      gender:
+        $ref: '#/definitions/Gender'
+  MatchRequestName:
+    description: |
+      Describes the name of the entity in the match request. The name can be specified simply by using the `full_name`
+      property, or it can be specified by providing name parts, such as `given_name` and `family_name`.
+      If both `full_name` and name parts are specified, the service provides matches based on the name parts specified.
+    type: object
+    allOf:
+    - $ref: '#/definitions/BaseName'
+  MatchResponseName:
+    type: object
+    allOf:
+    - $ref: '#/definitions/BaseName'
+    - type: object
+      properties:
+        job_title:
+          type: string
+          description: The functional/job title associated with a person name.
+        family_name_prefix:
+          type: string
+          description: The family name prefix, if available.
+          example: van
+        family_name_without_prefix:
+          type: string
+          description: The family name without any prefix, if there are any prefixes.
+          example: Gogh
+        generation_title:
+          type: string
+          description: The generation title of a person name, such as "Senior" or "Junior".
+          example: Junior
+  BaseName:
+    type: object
+    properties:
+      full_name:
+        type: string
+        description: The full name of an entity, person or organization, as a whole.
+      organization_name:
+        type: string
+      organization_type:
+        type: string
+      given_name:
+        type: string
+      middle_name:
+        type: string
+      family_name:
+        type: string
+  MatchRequestAddress:
+    type: object
+    allOf:
+    - $ref: '#/definitions/BaseAddress'
+  MatchResponseAddress:
+    type: object
+    allOf:
+    - $ref: '#/definitions/BaseAddress'
+  BaseAddress:
+    description: Describes the fields of a place or postal address.
+    type: object
+    properties:
+      address_lines:
+        type: array
+        items:
+          type: string
+        example:
+        - 1301 5th Ave
+      country:
+        type: string
+        example: US
+      province_or_state:
+        type: string
+        example: WA
+      county:
+        type: string
+        example: King
+      city:
+        type: string
+        example: Seattle
+      postal_code:
+        type: string
+        example: 98101
+  MatchRequestIdDocument:
+    type: object
+    allOf:
+    - $ref: '#/definitions/BaseIdDocument'
+  MatchResponseIdDocument:
+    type: object
+    allOf:
+    - $ref: '#/definitions/BaseIdDocument'
+    - type: object
+      properties:
+        remark:
+          type: string
+          description: Remarks from the source list about the ID document.
+  BaseIdDocument:
+    description: Describes the ID document or card used for identification.
+    type: object
+    required:
+    - type
+    - identifier
+    properties:
+      type:
+        $ref: '#/definitions/IdDocumentType'
+      identifier:
+        type: string
+        description: The document's identifier number or code.
+      issue_date:
+        type: string
+        format: date
+        description: Date of issue of the ID document.
+      issue_country:
+        type: string
+        description: Country that issued the ID document. The ISO 3166 2-letter country code is preferred.
+  MatchRequestCitizenship:
+    type: object
+    allOf:
+    - $ref: '#/definitions/BaseCitizenship'
+  MatchResponseCitizenship:
+    type: object
+    allOf:
+    - $ref: '#/definitions/BaseCitizenship'
+    - type: object
+      properties:
+        remark:
+          type: string
+          description: Remarks from the source list about the citizenship.
+  BaseCitizenship:
+    type: object
+    properties:
+      country:
+        type: string
+        description: Country of citizenship. The ISO 3166 2-letter country code is preferred.
+  MatchResponse:
+    type: object
+    properties:
+      records:
+        type: array
+        items:
+          $ref: '#/definitions/MatchResponseRecord'
+  MatchResponseRecord:
+    type: object
+    properties:
+      id:
+        type: string
+        description: User-specified reference ID or name as passed in.
+        example: qh7ALPQb
+      matches:
+        type: array
+        items:
+          $ref: '#/definitions/MatchResponseRecordMatch'
+      outcome:
+        $ref: '#/definitions/OutcomeDefinition'
+  MatchResponseRecordMatch:
+    type: object
+    properties:
+      reference:
+        $ref: '#/definitions/MatchResponseRecordMatchReference'
+      scores:
+        $ref: '#/definitions/MatchResponseRecordMatchScores'
+      entity_type:
+        $ref: '#/definitions/EntityType'
+      names:
+        type: array
+        items:
+          $ref: '#/definitions/MatchResponseName'
+      addresses:
+        type: array
+        items:
+          $ref: '#/definitions/MatchResponseAddress'
+      phone_number:
+        type: array
+        items:
+          type: string
+      email_address:
+        type: array
+        items:
+          type: string
+      citizenships:
+        type: array
+        items:
+          $ref: '#/definitions/MatchResponseCitizenship'
+      id_documents:
+        type: array
+        items:
+          $ref: '#/definitions/MatchResponseIdDocument'
+      birth_information:
+        type: array
+        items:
+          $ref: '#/definitions/MatchResponseBirthInformation'
+      gender:
+        $ref: '#/definitions/Gender'
+  MatchResponseRecordMatchReference:
+    type: object
+    properties:
+      source_list:
+        type: object
+        description: Describes the source list where a matching entity was found.
+        properties:
+          list_id:
+            $ref: '#/definitions/SourceList'
+          version:
+            type: string
+            description: The version of the source list where the entity was published. Typically, this is represented as a date.
+          record_id:
+            type: string
+            description: The ID for the record used in the matched source list.
+          remark:
+            type: string
+            description: Remarks that apply to the complete record.
+      markers:
+        type: array
+        items:
+          type: object
+          description: |
+            Describes markers found in the source list. A marker can be a sanction or a regulation that
+            applies to the entity.
+          properties:
+            name:
+              type: string
+              description: The name of the marker found in the source list.
+            url:
+              type: string
+              description: An optional URL that points to a resource with more information about the marker.
+  MatchResponseRecordMatchScores:
+    type: object
+    description: |
+      Contains score information for the match. For each match, an overall score is provided, but this object
+      may also contain other detailed scores. These types of scores, however, are match list- and
+      matching technology-dependent, which are subject to change.
+    properties:
+      overall:
+        type: number
+        format: float
+        minimum: 0
+        maximum: 100
+        example: 96
+        description: The overall match score.
+  MatchRequestBirthInformation:
+    type: object
+    description: Birth date and place information. Applies only to an entity of type `person`.
+    properties:
+      date:
+        type: string
+        description: Date of birth. Format is `yyyy-mm-dd` as specified by RFC3339.  Year only is accepted as well.
+      place:
+        type: string
+        description: Place of birth.
+  MatchResponseBirthInformation:
+    type: object
+    description: Birth date/place information (applies only to `person` entities).
+    properties:
+      place:
+        type: string
+        description: Place of birth.
+      date_range:
+        type: object
+        description: Range Of Birth Dates.  If range is exact, values will be the same.
+        properties:
+          from:
+            type: string
+            format: date
+            description: start date
+          to:
+            type: string
+            format: date
+            description: end date
+      circa:
+        type: boolean
+        default: false
+        description: says whether or not the date range an approximation
+  IdDocumentType:
+    type: string
+    description: |
+      The type of the ID document. The `Other` type acts as a wildcard when searching.
+    default: Other
+    enum:
+    - Passport
+    - National ID
+    - Social Security Number
+    - Other
+  SourceList:
+    type: string
+    description: |
+      Defines the source lists of the service.
+
+      Note: The 'TEST' list is an artificial source list, which is not included by default.
+      It is intended for integration testing and contains two records:
+      1) A person of name "John Doe".
+      2) An organization of name "Monsters, Inc.".
+    enum:
+    - EU_EEAS
+    - US_OFAC
+    - TEST
+  EntityType:
+    type: string
+    enum:
+    - person
+    - organization
+  Gender:
+    type: string
+    enum:
+    - Male
+    - Female
+    - Unknown
+  OutcomeDefinition:
+    type: object
+    required:
+      - category
+      - codes
+    properties:
+      category:
+        type: string
+        description: |
+          The final status of the matching operation.
+        enum:
+          - Matched
+          - Doubtful
+          - Unmatched
+          - Skipped
+      codes:
+        type: object
+        description: |
+          An object that contains status codes as keys, and details and messages as values.
+  error:
+    type: object
+    description: Describes an error object.
+    required:
+      - code
+    properties:
+      code:
+        type: integer
+        description: The HTTP status code.
+      message:
+        type: string
+        description: A human-readable error message.
+      additional_details:
+        type: object
+        description: Additional details about the error.
+    example:
+      code: 400
+      message: Bad request
