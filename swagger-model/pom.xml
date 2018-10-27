@@ -57,6 +57,18 @@
 						</configuration>
 					</execution>
 					<execution>
+						<id>generate-model-url</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<artifactId>dataservices-client-swagger-model-url</artifactId>
+							<inputSpec>${project.basedir}/url-validation-swagger.json</inputSpec>
+							<modelPackage>com.quadient.dataservices.url.model</modelPackage>
+							<invokerPackage>com.quadient.dataservices.url.invoker</invokerPackage>
+						</configuration>
+					</execution>
+					<execution>
 						<id>generate-model-name</id>
 						<goals>
 							<goal>generate</goal>
