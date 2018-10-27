@@ -26,6 +26,8 @@
 			<modules>
 				<module>swagger-model</module>
 				<module>api</module>
+				<module>models-core</module>
+				<module>models-admin</module>
 				<module>jersey</module>
 				<module>sample-app</module>
 			</modules>
@@ -35,6 +37,8 @@
 			<modules>
 				<module>swagger-model</module>
 				<module>api</module>
+				<module>models-core</module>
+				<module>models-admin</module>
 				<module>jersey</module>
 			</modules>
 			<build>

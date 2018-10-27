@@ -5,22 +5,19 @@
 		<artifactId>dataservices-client-parent</artifactId>
 		<version>0.15-SNAPSHOT</version>
 	</parent>
-	<artifactId>dataservices-client-jersey</artifactId>
+	<artifactId>dataservices-models-admin</artifactId>
 	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.quadient.dataservices</groupId>
-			<artifactId>dataservices-models-core</artifactId>
+			<artifactId>dataservices-client-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.glassfish.jersey.core</groupId>
-			<artifactId>jersey-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
+			<groupId>com.quadient.dataservices</groupId>
+			<artifactId>dataservices-client-swagger-model</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 
