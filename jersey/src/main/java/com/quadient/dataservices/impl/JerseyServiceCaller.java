@@ -81,7 +81,7 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
     }
 
     protected <T> Response<T> fireRequestInternal(Request<T> request, int attemptNo) {
-        final UriBuilder uriBuilder = UriBuilder.fromUri(getBaseUri()).path(request.getPath());
+        final UriBuilder uriBuilder = UriBuilder.fromUri(getBaseUri() + request.getPath());
 
         final javax.ws.rs.core.Response response;
         final Client client = clientBuilder.build();
