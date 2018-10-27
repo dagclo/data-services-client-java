@@ -13,13 +13,13 @@ public class CommandLineArgs {
 
     public static Credentials getCredentials(String[] args) {
         if (args.length == 4) {
-            final HasBaseUri region = getRegion(args[0]);
+            final HasBaseUri region = getBaseUri(args[0]);
             final String company = args[1];
             final String username = args[2];
             final String password = args[3];
             return new QuadientCloudCredentials(region.getBaseUri(), company, username, password.toCharArray());
         } else if (args.length == 3) {
-            final HasBaseUri region = getRegion(args[0]);
+            final HasBaseUri region = getBaseUri(args[0]);
             final String username = args[1];
             final String password = args[2];
             return new AdministrativeCredentials(region.getBaseUri(), username, password.toCharArray());
@@ -31,7 +31,7 @@ public class CommandLineArgs {
         }
     }
 
-    public static HasBaseUri getRegion(String argument) {
+    public static HasBaseUri getBaseUri(String argument) {
         return argument.length() == 2 ? Region.valueOf(argument) : () -> URI.create(argument);
     }
 
