@@ -11,6 +11,7 @@ import com.quadient.dataservices.api.Credentials;
 import com.quadient.dataservices.api.JobCreationDetails;
 import com.quadient.dataservices.api.JobSession;
 import com.quadient.dataservices.api.Response;
+import com.quadient.dataservices.jobs.model.JobInformationResponse;
 
 public class JerseyClient extends JerseyServiceCaller implements Client {
 
@@ -42,8 +43,8 @@ public class JerseyClient extends JerseyServiceCaller implements Client {
 
     @Override
     public JobSession createJob(JobCreationDetails jobRequestDetails) {
-        final Response<JobCreationResponse> response = executeSafe(new JobCreationRequest(jobRequestDetails));
-        final JobCreationResponse jobCreationResponse = response.getBody();
+        final Response<JobInformationResponse> response = executeSafe(new JobCreationRequest(jobRequestDetails));
+        final JobInformationResponse jobCreationResponse = response.getBody();
         final String jobId = jobCreationResponse.getJobId();
         return new JerseyJobSession(getClientBuilder(), getAccessTokenProvider(), getBaseUri(), jobId);
     }

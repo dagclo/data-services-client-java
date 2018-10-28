@@ -33,6 +33,30 @@
 				</configuration>
 				<executions>
 					<execution>
+						<id>generate-model-users</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<artifactId>dataservices-client-swagger-model-users</artifactId>
+							<inputSpec>${swagger.baseurl}/users/swagger.json</inputSpec>
+							<modelPackage>com.quadient.dataservices.users.model</modelPackage>
+							<invokerPackage>com.quadient.dataservices.users.invoker</invokerPackage>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-model-jobs</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<artifactId>dataservices-client-swagger-model-jobs</artifactId>
+							<inputSpec>${swagger.baseurl}/jobs/swagger.json</inputSpec>
+							<modelPackage>com.quadient.dataservices.jobs.model</modelPackage>
+							<invokerPackage>com.quadient.dataservices.jobs.invoker</invokerPackage>
+						</configuration>
+					</execution>
+					<execution>
 						<id>generate-model-country</id>
 						<goals>
 							<goal>generate</goal>
