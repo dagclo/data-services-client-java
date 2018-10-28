@@ -12,11 +12,12 @@ import javax.ws.rs.core.UriBuilder;
 
 import com.quadient.dataservices.api.AccessTokenProvider;
 import com.quadient.dataservices.api.AdministrativeCredentials;
+import com.quadient.dataservices.api.AuthorizationHeaderProvider;
 import com.quadient.dataservices.api.Credentials;
 import com.quadient.dataservices.api.QuadientCloudCredentials;
 import com.quadient.dataservices.exceptions.AuthenticationException;
 
-public final class AccessTokenProviderImpl implements AccessTokenProvider {
+public final class AuthorizationHeaderProviderImpl implements AuthorizationHeaderProvider {
 
     // Default expiration is 10 minutes. To be conservative, renew every 8 minutes.
     private static final long TOKEN_EXPIRATION_MS = 8 * 60 * 1000;
@@ -43,7 +44,7 @@ public final class AccessTokenProviderImpl implements AccessTokenProvider {
             final AdministrativeCredentials administrativeCredentials = (AdministrativeCredentials) credentials;
             require("Username", administrativeCredentials.getUsername());
             require("Password", new String(administrativeCredentials.getPassword()));
-        } else if (credentials instanceof AccessTokenProvider) {
+        } else if (credentials instanceof AccessTokenProvider || credentials instanceof AuthorizationHeaderProvider) {
             // nothing to validate
         } else {
             throw new UnsupportedOperationException(
@@ -57,13 +58,18 @@ public final class AccessTokenProviderImpl implements AccessTokenProvider {
         }
     }
 
-    public AccessTokenProviderImpl(Credentials credentials, ClientBuilder clientBuilder) {
+    public AuthorizationHeaderProviderImpl(Credentials credentials, ClientBuilder clientBuilder) {
         validateCredentials(credentials);
         this.credentials = credentials;
         this.clientBuilder = clientBuilder;
     }
 
-    public String getAccessToken() {
+    @Override
+    public String getAuthorizationHeader() {
+        if (credentials instanceof AuthorizationHeaderProvider) {
+            return ((AuthorizationHeaderProvider) credentials).getAuthorizationHeader();
+        }
+
         if (latestTokenIssueTimestamp + TOKEN_EXPIRATION_MS < System.currentTimeMillis()) {
             final String token;
             if (credentials instanceof QuadientCloudCredentials) {
@@ -82,7 +88,7 @@ public final class AccessTokenProviderImpl implements AccessTokenProvider {
             latestToken = token;
         }
 
-        return latestToken;
+        return "Bearer " + latestToken;
     }
 
     private String requestAccessToken(AdministrativeCredentials administrativeCredentials) {

@@ -7,7 +7,7 @@ import com.quadient.dataservices.exceptions.DataServicesException;
 /**
  * Represents a client of Quadient Data Services
  */
-public interface Client extends ServiceCaller, AccessTokenProvider {
+public interface Client extends ServiceCaller {
 
     /**
      * Creates a job in Quadient Data Services.

@@ -10,13 +10,13 @@ import com.quadient.dataservices.api.FiniteJobStatus;
 import com.quadient.dataservices.api.JobSession;
 import com.quadient.dataservices.api.JobStatus;
 import com.quadient.dataservices.api.Response;
-import com.quadient.dataservices.impl.auth.AccessTokenProviderImpl;
+import com.quadient.dataservices.impl.auth.AuthorizationHeaderProviderImpl;
 
 final class JerseyJobSession extends JerseyServiceCaller implements JobSession {
 
     private final String jobId;
 
-    public JerseyJobSession(ClientBuilder clientBuilder, AccessTokenProviderImpl accessTokenProvider, URI baseUri,
+    public JerseyJobSession(ClientBuilder clientBuilder, AuthorizationHeaderProviderImpl accessTokenProvider, URI baseUri,
             String jobId) {
         super(clientBuilder, accessTokenProvider, baseUri);
         Objects.requireNonNull(jobId);
