@@ -19,7 +19,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.quadient.dataservices.api.AccessTokenProvider;
+import com.quadient.dataservices.api.AuthorizationHeaderProvider;
 import com.quadient.dataservices.api.Credentials;
 import com.quadient.dataservices.api.FailedResponse;
 import com.quadient.dataservices.api.HasBaseUri;
@@ -31,9 +31,9 @@ import com.quadient.dataservices.api.ServiceCaller;
 import com.quadient.dataservices.api.SuccessfulResponse;
 import com.quadient.dataservices.exceptions.CreditBalanceException;
 import com.quadient.dataservices.exceptions.RequestTooLargeException;
-import com.quadient.dataservices.impl.auth.AccessTokenProviderImpl;
+import com.quadient.dataservices.impl.auth.AuthorizationHeaderProviderImpl;
 
-abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider {
+abstract class JerseyServiceCaller implements ServiceCaller, AuthorizationHeaderProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JerseyServiceCaller.class);
 
@@ -43,12 +43,12 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private static final String HEADER_AUTHORIZATION = "Authorization";
 
-    private final AccessTokenProviderImpl accessTokenProvider;
+    private final AuthorizationHeaderProviderImpl authoritzationHeaderProvider;
     private final ClientBuilder clientBuilder;
     private final URI baseUri;
 
     public JerseyServiceCaller(ClientBuilder clientBuilder, Credentials credentials) {
-        this(clientBuilder, new AccessTokenProviderImpl(credentials, clientBuilder), getBaseUri(credentials));
+        this(clientBuilder, new AuthorizationHeaderProviderImpl(credentials, clientBuilder), getBaseUri(credentials));
     }
 
     private static URI getBaseUri(Credentials credentials) {
@@ -58,16 +58,16 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
         throw new UnsupportedOperationException("Unsupported credentials type: " + credentials.getClass().getName());
     }
 
-    protected JerseyServiceCaller(ClientBuilder clientBuilder, AccessTokenProviderImpl accessTokenProvider,
-            URI baseUri) {
+    protected JerseyServiceCaller(ClientBuilder clientBuilder,
+            AuthorizationHeaderProviderImpl authorizationHeaderProvider, URI baseUri) {
         this.clientBuilder = clientBuilder;
-        this.accessTokenProvider = accessTokenProvider;
+        this.authoritzationHeaderProvider = authorizationHeaderProvider;
         this.baseUri = baseUri;
     }
 
     @Override
-    public String getAccessToken() {
-        return accessTokenProvider.getAccessToken();
+    public String getAuthorizationHeader() {
+        return authoritzationHeaderProvider.getAuthorizationHeader();
     }
 
     @Override
@@ -100,7 +100,7 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
                 requestBuilder.header(key, headers.getValue(key));
             }
             if (!keys.contains(HEADER_AUTHORIZATION)) {
-                requestBuilder.header(HEADER_AUTHORIZATION, "Bearer " + accessTokenProvider.getAccessToken());
+                requestBuilder.header(HEADER_AUTHORIZATION, getAuthorizationHeader());
             }
             interceptRequestBefore(requestBuilder);
 
@@ -173,9 +173,8 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
                 try {
                     responseString = response.readEntity(String.class);
                 } catch (Exception e2) {
-                    logger.warn("{} {} failed to re-read failed response entity as a string: {}",
-                            request.getMethod(), request.getPath(),
-                            e2.getMessage());
+                    logger.warn("{} {} failed to re-read failed response entity as a string: {}", request.getMethod(),
+                            request.getPath(), e2.getMessage());
                 }
                 return new FailedResponse<T>(statusCode, response.getStatusInfo().getReasonPhrase(), responseHeaders,
                         responseString, e);
@@ -218,7 +217,7 @@ abstract class JerseyServiceCaller implements ServiceCaller, AccessTokenProvider
         return clientBuilder;
     }
 
-    protected AccessTokenProviderImpl getAccessTokenProvider() {
-        return accessTokenProvider;
+    protected AuthorizationHeaderProviderImpl getAccessTokenProvider() {
+        return authoritzationHeaderProvider;
     }
 }
