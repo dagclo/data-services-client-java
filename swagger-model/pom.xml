@@ -164,6 +164,18 @@
 							<invokerPackage>com.quadient.dataservices.sanctionlists.invoker</invokerPackage>
 						</configuration>
 					</execution>
+					<execution>
+						<id>generate-model-walk-sequence</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<artifactId>dataservices-client-swagger-model-walk-sequence</artifactId>
+							<inputSpec>${swagger.baseurl}/services/walk-sequence/swagger.json</inputSpec>
+							<modelPackage>com.quadient.dataservices.walksequence.model</modelPackage>
+							<invokerPackage>com.quadient.dataservices.walksequence.invoker</invokerPackage>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>

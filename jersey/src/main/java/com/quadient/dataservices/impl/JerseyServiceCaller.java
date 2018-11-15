@@ -87,7 +87,8 @@ abstract class JerseyServiceCaller implements ServiceCaller, AuthorizationHeader
         final Client client = clientBuilder.build();
         try {
             final WebTarget webTarget = client.target(uriBuilder);
-            final Entity<Object> requestEntity = Entity.json(request.getBody());
+            final Object bodyObject = request.getBody();
+            final Entity<Object> requestEntity = bodyObject == null ? null : Entity.json(bodyObject);
             final Builder requestBuilder;
             final Headers headers = request.getHeaders();
             if (headers.getValue(HEADER_CONTENT_TYPE) == null) {
@@ -105,7 +106,11 @@ abstract class JerseyServiceCaller implements ServiceCaller, AuthorizationHeader
             interceptRequestBefore(requestBuilder);
 
             try {
-                response = requestBuilder.method(request.getMethod(), requestEntity);
+                if (requestEntity == null) {
+                    response = requestBuilder.method(request.getMethod());
+                } else {
+                    response = requestBuilder.method(request.getMethod(), requestEntity);
+                }
             } catch (UncheckedIOException e) {
                 throw e;
             } catch (RuntimeException e) {
