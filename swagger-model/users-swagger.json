@@ -1757,7 +1757,6 @@
                 },
                 "filed_date": {
                     "type": "string",
-                    "format": "date-time",
                     "description": "date of the transaction"
                 },
                 "billing_transaction_id": {
@@ -1828,7 +1827,6 @@
                 },
                 "timestamp": {
                     "type": "string",
-                    "format": "date-time",
                     "description": "when user was locked out"
                 }
             }
