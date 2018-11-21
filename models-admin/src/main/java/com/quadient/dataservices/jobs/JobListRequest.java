@@ -48,22 +48,22 @@ public class JobListRequest extends SimpleGetRequest<JobListing> {
     @Override
     public String getPath() {
         final StringBuilder sb = new StringBuilder("/jobs/v1");
-        addParam(sb, "", owner);
-        addParam(sb, "", parentId);
-        addParam(sb, "", origin);
-        addParam(sb, "", originExclude);
-        addParam(sb, "", tenantPrefix);
-        addParam(sb, "", tenant);
-        addParam(sb, "", tenantExclude);
-        addParam(sb, "", createdFrom);
-        addParam(sb, "", createdTo);
-        addParam(sb, "", usageFrom);
-        addParam(sb, "", usageTo);
-        addParam(sb, "", status);
-        addParam(sb, "", statusExclude);
-        addParam(sb, "", includeChildJobs);
-        addParam(sb, "", limit);
-        addParam(sb, "", offset);
+        addParam(sb, "owner", owner);
+        addParam(sb, "parent_id", parentId);
+        addParam(sb, "origin", origin);
+        addParam(sb, "origin_exclude", originExclude);
+        addParam(sb, "tenant_prefix", tenantPrefix);
+        addParam(sb, "tenant", tenant);
+        addParam(sb, "tenant_exclude", tenantExclude);
+        addParam(sb, "created_from", createdFrom);
+        addParam(sb, "created_to", createdTo);
+        addParam(sb, "usage_from", usageFrom);
+        addParam(sb, "usage_to", usageTo);
+        addParam(sb, "status", status);
+        addParam(sb, "status_exclude", statusExclude);
+        addParam(sb, "include_child_jobs", includeChildJobs);
+        addParam(sb, "limit", limit);
+        addParam(sb, "offset", offset);
         return sb.toString();
     }
 

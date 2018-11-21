@@ -1,0 +1,1896 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.1.37",
+        "title": "User Management",
+        "description": "Provides an API to:\n  * Enumerate the user base\n  * Create new users\n  * Gather specific user's information\n  * Change a user's information\n\nUser information include things like:\n  * Whether or not the user account is `enabled` or not\n  * Username/password credentials as well as API keys\n  * Contact information such as `first_name`, `last_name`, `organization` and `email_address`\n  * Group membership - membership of a `group` is used to grant access to services and features\n  * Tenant membership - membership of a `tenant` is used to assign users specific `roles` in a organization\n  * Additional details - each user may have a collection of custom key-value pairs\n\nFor details about authentication, refer to the [authentication specification](/oauth/swagger.json)."
+    },
+    "paths": {
+        "/user/v1": {
+            "get": {
+                "summary": "Gets the currently authenticated user's information.",
+                "tags": [
+                    "current_user"
+                ],
+                "description": "Retrieves information about the currently authenticated user. The header's `Authorization` key's bearer token (a `JWT`) is decoded in order to retrieve the authenticated user's identity. That identity is then used to retrieve further details. - The bearer token must not be expired.",
+                "responses": {
+                    "200": {
+                        "description": "Successful response - serving current user information.",
+                        "schema": {
+                            "$ref": "#/definitions/userInformationResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Change the password of the currently authenticated user.",
+                "tags": [
+                    "current_user"
+                ],
+                "parameters": [
+                    {
+                        "name": "userUpdate",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ownUserUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - password updated.",
+                        "schema": {
+                            "$ref": "#/definitions/userInformationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad password."
+                    }
+                }
+            }
+        },
+        "/user/v1/credit_balance": {
+            "get": {
+                "description": "Gets the credit balance history of the logged in user",
+                "tags": [
+                    "user_credits"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - returns list of transactions",
+                        "schema": {
+                            "$ref": "#/definitions/creditBalanceResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching user.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/v1/api-keys": {
+            "get": {
+                "description": "Gets the api keys for the logged in user",
+                "tags": [
+                    "api_keys"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - returning API keys",
+                        "schema": {
+                            "$ref": "#/definitions/apiKeyListing"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new api key for the logged in user",
+                "tags": [
+                    "api_keys"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - API key created",
+                        "schema": {
+                            "$ref": "#/definitions/apiKeyInformation"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/v1/api-keys/{key_id}": {
+            "parameters": [
+                {
+                    "name": "key_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string",
+                    "description": "The ID of an API key belonging to the logged in user."
+                }
+            ],
+            "get": {
+                "description": "Gets information about a particular API key",
+                "tags": [
+                    "api_keys"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - returning API key information",
+                        "schema": {
+                            "$ref": "#/definitions/apiKeyInformationWithoutSecret"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching API key.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Disables a particular API key",
+                "tags": [
+                    "api_keys"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - returning API key information",
+                        "schema": {
+                            "$ref": "#/definitions/apiKeyInformationWithoutSecret"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching API key.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1": {
+            "get": {
+                "summary": "Queries for users in the system",
+                "description": "Retrieves the collection of users that matches the search criteria (query parameters).",
+                "tags": [
+                    "user_administration"
+                ],
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "Optional filter on email address"
+                    },
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "Optional filter on user name"
+                    },
+                    {
+                        "name": "disabled",
+                        "in": "query",
+                        "description": "Includes disabled accounts in the result. This value is false by default.",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "The number of records to return. This value is 500 by default.",
+                        "default": "500",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "The 0 based offset of the start of the records to return. This value is 0 by default.",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "name": "direction",
+                        "in": "query",
+                        "description": "The sort direction of the records, based on the user's email address. This value accepts 'asc' or 'dsc' and is 'asc' by default.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "tenant",
+                        "in": "query",
+                        "description": "Optional filter on tenantship",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "ext_sub",
+                        "in": "query",
+                        "description": "Optional filter on external subject. urlencoded '*' (%2A) means \"if exists\".",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "locked",
+                        "in": "query",
+                        "description": "Optional filter on lock out status.",
+                        "required": false,
+                        "type": "boolean"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - serving a list of usernames.",
+                        "schema": {
+                            "$ref": "#/definitions/userListResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create user",
+                "description": "Create a new user. The email address is the required, and must be unique. The username, if supplied, must also be unique to the system. If a username is not supplied, the resulting username will mirror the email address.",
+                "tags": [
+                    "user_administration"
+                ],
+                "parameters": [
+                    {
+                        "name": "userInformation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userInformationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successful response - user created",
+                        "schema": {
+                            "$ref": "#/definitions/userInformationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad username or password."
+                    }
+                }
+            }
+        },
+        "/users/v1/{user_id}": {
+            "parameters": [
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "description": "A unique user id. User ids/hrefs can be discovered via enumeration/querying (`GET` `/users/v1`).",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "summary": "Gets a user's information",
+                "description": "Gets information about a particular user",
+                "tags": [
+                    "user_administration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - serving user information",
+                        "schema": {
+                            "$ref": "#/definitions/userInformationResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching user.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Disables a user",
+                "description": "Disables a particular user. A disabled account will fail to authenticate. Re-enable an account via a account update (`POST`)",
+                "tags": [
+                    "user_administration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - serving user information",
+                        "schema": {
+                            "$ref": "#/definitions/userInformationResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching user.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Update a user",
+                "description": "Allows partial updates to a user. Define the attributes to change, leave out the attributes to keep as-is. Certain attributes such as `user_id` are immutable.",
+                "tags": [
+                    "user_administration"
+                ],
+                "parameters": [
+                    {
+                        "name": "userInformation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - user updated",
+                        "schema": {
+                            "$ref": "#/definitions/userInformationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad username or password."
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/users/v1/{user_id}/api-keys": {
+            "parameters": [
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string",
+                    "description": "A unique user id. User ids/hrefs can be discovered via enumeration/querying (`GET` `/users/v1`)."
+                }
+            ],
+            "get": {
+                "description": "Gets the api keys of a particular user",
+                "tags": [
+                    "user_administration",
+                    "api_keys"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - returning API keys",
+                        "schema": {
+                            "$ref": "#/definitions/apiKeyListing"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching user.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new api key for a particular user",
+                "tags": [
+                    "user_administration",
+                    "api_keys"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - API key created",
+                        "schema": {
+                            "$ref": "#/definitions/apiKeyInformation"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching user.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1/{user_id}/api-keys/{key_id}": {
+            "parameters": [
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string",
+                    "description": "A unique user id. User ids/hrefs can be discovered via enumeration/querying (`GET` `/users/v1`)."
+                },
+                {
+                    "name": "key_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string",
+                    "description": "The ID of an API key belonging to the user."
+                }
+            ],
+            "get": {
+                "description": "Gets information about a particular API key",
+                "tags": [
+                    "user_administration",
+                    "api_keys"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - returning API key information",
+                        "schema": {
+                            "$ref": "#/definitions/apiKeyInformationWithoutSecret"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching user or API key.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Disables a particular API key",
+                "tags": [
+                    "user_administration",
+                    "api_keys"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - returning API key information",
+                        "schema": {
+                            "$ref": "#/definitions/apiKeyInformationWithoutSecret"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching user or API key.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1/{user_id}/oauth/token": {
+            "parameters": [
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                },
+                {
+                    "name": "subject_type",
+                    "in": "query",
+                    "required": true,
+                    "type": "string",
+                    "description": "The type of subject to include in the token.",
+                    "enum": [
+                        "ext_sub",
+                        "user_id"
+                    ]
+                },
+                {
+                    "name": "tenant",
+                    "in": "query",
+                    "required": false,
+                    "type": "string",
+                    "description": "The tenant to include in the token. This parameter is required for users that are members of multiple tenants."
+                },
+                {
+                    "name": "origin",
+                    "in": "query",
+                    "required": false,
+                    "type": "string",
+                    "description": "The origin value to include in the token. 'An origin' value should represent the name of the data servi ceintegration, for example the application name or website name. Origin values will be made available as ways to group and filter usage data later."
+                }
+            ],
+            "get": {
+                "summary": "generate an oauth token on behalf of the user",
+                "tags": [
+                    "oauth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/authResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1/{user_id}/settings": {
+            "parameters": [
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "summary": "get all settings for user",
+                "tags": [
+                    "settings administration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/userSettingsResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User Not Found"
+                    }
+                }
+            }
+        },
+        "/users/v1/{user_id}/settings/{namespaceName}": {
+            "parameters": [
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                },
+                {
+                    "name": "namespaceName",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "summary": "get all of a user's settings for namespace",
+                "tags": [
+                    "settings administration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "User or Namespace Not Found"
+                    }
+                }
+            },
+            "put": {
+                "summary": "wholesale replace for users's namespaceName",
+                "tags": [
+                    "settings administration"
+                ],
+                "parameters": [
+                    {
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "add/update settings for user's namespaceName",
+                "tags": [
+                    "settings administration"
+                ],
+                "parameters": [
+                    {
+                        "name": "settings",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "delete all settings under user's namespace",
+                "tags": [
+                    "settings administration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+        "/users/v1/{user_id}/tenants": {
+            "parameters": [
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "description": "A unique user id. User ids/hrefs can be discovered via enumeration/querying (`GET` `/users/v1`).",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "description": "Gets the tenant information about a particular user",
+                "tags": [
+                    "user_administration",
+                    "tenants"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - returning all user tenant membership",
+                        "schema": {
+                            "$ref": "#/definitions/tenantCollection"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching user.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Sets the entire domain of tenants for the user",
+                "tags": [
+                    "user_administration",
+                    "tenants"
+                ],
+                "parameters": [
+                    {
+                        "name": "tenants",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/tenantCollection"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - confirmation of tenant setting",
+                        "schema": {
+                            "$ref": "#/definitions/tenantCollection"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Removes all tenant information from user",
+                "tags": [
+                    "user_administration",
+                    "tenants"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - confirmation of tenant clearing"
+                    },
+                    "404": {
+                        "description": "Could not find matching user.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1/{user_id}/tenants/{tenant_name}": {
+            "parameters": [
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "description": "A unique user id. User ids/hrefs can be discovered via enumeration/querying (`GET` `/users/v1`).",
+                    "required": true,
+                    "type": "string"
+                },
+                {
+                    "name": "tenant_name",
+                    "in": "path",
+                    "description": "A well-known tenant name.",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "description": "Gets user's tenant information for a particular tenant",
+                "tags": [
+                    "user_administration",
+                    "tenants"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - serving a user's tenant information",
+                        "schema": {
+                            "$ref": "#/definitions/tenantInformation"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching user.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Removes the user from the identified tenant",
+                "tags": [
+                    "user_administration",
+                    "tenants"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - confirmation of removal"
+                    },
+                    "404": {
+                        "description": "Could not find matching user or tenant",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Set a particular tenant information for the given user",
+                "tags": [
+                    "user_administration",
+                    "tenants"
+                ],
+                "parameters": [
+                    {
+                        "name": "tenant",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/tenantInformation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - user tenants set to given collection",
+                        "schema": {
+                            "$ref": "#/definitions/tenantInformation"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/users/v1/groups": {
+            "get": {
+                "description": "List existing groups",
+                "tags": [
+                    "user_administration",
+                    "groups"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A complete listing of existing groups",
+                        "schema": {
+                            "$ref": "#/definitions/groupListingResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new group",
+                "tags": [
+                    "user_administration",
+                    "groups"
+                ],
+                "parameters": [
+                    {
+                        "name": "group",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/createGroupRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The new group was successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/groupListingResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1/policies": {
+            "get": {
+                "description": "List existing policies",
+                "tags": [
+                    "user_administration",
+                    "groups",
+                    "policies"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A complete listing of existing policies",
+                        "schema": {
+                            "$ref": "#/definitions/policyListingResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new policy",
+                "tags": [
+                    "user_administration",
+                    "groups",
+                    "policies"
+                ],
+                "parameters": [
+                    {
+                        "name": "policy",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/policyItem"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The new policy was successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/policyListingResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Policy definition"
+                    }
+                }
+            }
+        },
+        "/users/v1/service-configurations": {
+            "get": {
+                "description": "List existing service configurations",
+                "tags": [
+                    "user_administration",
+                    "groups",
+                    "service_configurations"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A complete listing of existing service_configurations.",
+                        "schema": {
+                            "$ref": "#/definitions/serviceConfigurationListingResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new service configuration",
+                "tags": [
+                    "user_administration",
+                    "groups",
+                    "service_configurations"
+                ],
+                "parameters": [
+                    {
+                        "name": "service_configuration",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/serviceConfigurationItem"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The new service configuration was successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/serviceConfigurationListingResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Service Configuration definition"
+                    }
+                }
+            }
+        },
+        "/users/v1/tenants": {
+            "get": {
+                "description": "List existing tenants",
+                "tags": [
+                    "user_administration",
+                    "tenants"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tenants",
+                        "schema": {
+                            "$ref": "#/definitions/tenantCollection"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a new tenant or update group membership for an existing tenant.",
+                "tags": [
+                    "user_administration",
+                    "tenants"
+                ],
+                "parameters": [
+                    {
+                        "name": "tenant",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/tenantDefinition"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The new tenant was successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/tenantDefinition"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1/tenants/{tenant_name}": {
+            "parameters": [
+                {
+                    "name": "tenant_name",
+                    "in": "path",
+                    "description": "A unique tenant name. Tenant names/hrefs can be discovered via enumeration/querying (`GET` `/users/v1/tenants`).",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "description": "Get tenant information.",
+                "tags": [
+                    "tenants"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The tenant with the matching name.",
+                        "schema": {
+                            "$ref": "#/definitions/tenantInformation"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1/tenants/{tenant_name}/services": {
+            "parameters": [
+                {
+                    "name": "tenant_name",
+                    "in": "path",
+                    "description": "A unique tenant name. Tenant name/hrefs can be discovered via enumeration/querying (`GET` `/users/v1/tenants`).",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "description": "Get the list of enabled and disabled services for this tenant.",
+                "tags": [
+                    "tenants"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The collection of service descriptors for the tenant.",
+                        "schema": {
+                            "$ref": "#/definitions/serviceAccessDescriptorListing"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1/tenants/{tenant_name}/services/{service_name}": {
+            "parameters": [
+                {
+                    "name": "tenant_name",
+                    "in": "path",
+                    "description": "A unique tenant name. Tenant names/hrefs can be discovered via enumeration/querying (`GET` `/users/v1/tenants`).",
+                    "required": true,
+                    "type": "string"
+                },
+                {
+                    "name": "service_name",
+                    "in": "path",
+                    "description": "A unique service name.  Service names can be discovered via enumeration/querying (`GET` `/services`)",
+                    "required": true,
+                    "type": "string"
+                }
+            ],
+            "get": {
+                "description": "Get the service access descriptor in place for the tenant for the named service.",
+                "tags": [
+                    "tenants",
+                    "services"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The service access descriptor belonging to this tenant for the named service.",
+                        "schema": {
+                            "$ref": "#/definitions/serviceAccessDescriptor"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Add or overwrite existing access descriptor for this tenant for the named service.",
+                "tags": [
+                    "tenants",
+                    "services"
+                ],
+                "parameters": [
+                    {
+                        "name": "service_access_request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/serviceAccessRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully updated access descriptor for the named service.",
+                        "schema": {
+                            "$ref": "#/definitions/serviceAccessDescriptor"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1/tenant_roles": {
+            "get": {
+                "description": "List roles available to tenants",
+                "tags": [
+                    "user_administration",
+                    "tenants"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The set of existing tenant roles",
+                        "schema": {
+                            "$ref": "#/definitions/roleListingResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new role for tenant users",
+                "tags": [
+                    "user_administration",
+                    "tenants"
+                ],
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/roleDefinition"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The new role was successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/roleListingResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1/credits/{user_id}/transaction": {
+            "parameters": [
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string",
+                    "description": "A unique user id. User ids/hrefs can be discovered via enumeration/querying (`GET` `/users/v1`)."
+                }
+            ],
+            "get": {
+                "description": "Gets the transaction history of a particular user",
+                "tags": [
+                    "user_credits"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - returns list of transactions",
+                        "schema": {
+                            "$ref": "#/definitions/creditHistory"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching user.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a Credit Transaction",
+                "tags": [
+                    "user_credits"
+                ],
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/creditEntry"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The new role was successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/creditEntry"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1/credits/{user_id}/balance": {
+            "parameters": [
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string",
+                    "description": "A unique user id. User ids/hrefs can be discovered via enumeration/querying (`GET` `/users/v1`)."
+                }
+            ],
+            "get": {
+                "description": "Gets the credit balance history of a particular user",
+                "tags": [
+                    "user_credits"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - returns list of transactions",
+                        "schema": {
+                            "$ref": "#/definitions/creditBalanceResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Could not find matching user.",
+                        "schema": {
+                            "$ref": "#/definitions/error"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/v1/{user_id}/lockout": {
+            "parameters": [
+                {
+                    "name": "user_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string",
+                    "description": "A unique user id. User ids/hrefs can be discovered via enumeration/querying (`GET` `/users/v1`)."
+                }
+            ],
+            "post": {
+                "summary": "lockout user",
+                "description": "This blocks a user from using specific services",
+                "tags": [
+                    "user_administration"
+                ],
+                "parameters": [
+                    {
+                        "name": "lockoutRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/lockOutRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Successful response - user lockout created"
+                    }
+                }
+            },
+            "get": {
+                "summary": "retrieve lockouts",
+                "description": "This lists the services and the reason the user has been blocked",
+                "tags": [
+                    "user_administration"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response - returns list of lockouts",
+                        "schema": {
+                            "$ref": "#/definitions/lockOutInformation"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "userInformationResponse": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "string",
+                    "description": "The user_id of the user."
+                },
+                "uri": {
+                    "type": "string",
+                    "description": "An href to the user resource."
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "email_address": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Groups this user belongs to."
+                },
+                "ext_sub": {
+                    "type": "string",
+                    "description": "url originating store of user"
+                },
+                "tenants": {
+                    "type": "object",
+                    "description": "Defines the tenants that this user is a part of or has specific privileges against.",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/tenantInformation"
+                    }
+                },
+                "origin": {
+                    "type": "string",
+                    "description": "How or why the user was created."
+                },
+                "created_by": {
+                    "type": "string",
+                    "description": "The user_id that created the user."
+                },
+                "created_at": {
+                    "type": "string",
+                    "description": "The UTC time of creating the user."
+                },
+                "lock_outs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/lockOutInformation"
+                    }
+                },
+                "additional_details": {
+                    "type": "object",
+                    "description": "Additional details about the user"
+                }
+            }
+        },
+        "userInformationRequest": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "type": "string"
+                },
+                "email_address": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string",
+                    "description": "The user's given/first name."
+                },
+                "last_name": {
+                    "type": "string",
+                    "description": "The user's last name."
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Allows setting the account's initial enabled state."
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Must conform the the password policy of the tenant."
+                },
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "A collection of currently existing groups that this user is to belong to."
+                },
+                "tenants": {
+                    "type": "object",
+                    "description": "Defines the tenants that this user is a part of or has specific privileges against.",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/tenantInformation"
+                    }
+                },
+                "origin": {
+                    "type": "string",
+                    "description": "How or why the user was created."
+                },
+                "additional_details": {
+                    "type": "object",
+                    "description": "Additional details about the user."
+                },
+                "ext_sub": {
+                    "type": "string",
+                    "description": "url originating store of user"
+                }
+            }
+        },
+        "userSettingsResponse": {
+            "type": "object",
+            "properties": {
+                "namespaces": {
+                    "type": "object",
+                    "properties": {
+                        "namespace": {
+                            "type": "string"
+                        }
+                    },
+                    "example": {
+                        "namespaceName": "/generated/uri",
+                        "nameExample": "/users/v1/userIdExample/settings/nameExample"
+                    }
+                }
+            }
+        },
+        "ownUserUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "description": "Must conform the the password policy."
+                }
+            }
+        },
+        "userUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "type": "string"
+                },
+                "email_address": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string",
+                    "description": "The user's given/first name."
+                },
+                "last_name": {
+                    "type": "string",
+                    "description": "The user's last name."
+                },
+                "origin": {
+                    "type": "string",
+                    "description": "service that created user"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Allows setting the account's initial enabled state."
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Must conform the the password policy."
+                },
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "A collection of currently existing groups that this user is to belong to."
+                },
+                "additional_details": {
+                    "type": "object",
+                    "description": "Additional details about the user."
+                }
+            }
+        },
+        "apiKeyListing": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/apiKeySummary"
+            }
+        },
+        "apiKeySummary": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The public ID of this API key"
+                },
+                "uri": {
+                    "type": "string",
+                    "description": "The URI to get more information about this API key"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Whether or not this API key is currently enabled/active"
+                }
+            }
+        },
+        "apiKeyInformationWithoutSecret": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The public ID of this API key"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Whether or not this API key is currently enabled/active"
+                }
+            }
+        },
+        "apiKeyInformation": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The public ID of this API key"
+                },
+                "secret": {
+                    "type": "string",
+                    "description": "The API key secret"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Whether or not this API key is currently enabled/active"
+                }
+            }
+        },
+        "tenantCollection": {
+            "type": "object",
+            "description": "A collection of tenants and tenant information.",
+            "additionalProperties": {
+                "$ref": "#/definitions/tenantInformation"
+            }
+        },
+        "tenantInformation": {
+            "type": "object",
+            "properties": {
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "A collection of currently existing roles names."
+                }
+            }
+        },
+        "userListResponse": {
+            "type": "object",
+            "description": "A collection of user summaries. The list will be empty if no matching users are found or if the search criteria are not specific enough (ie. the 'enabled' parameter is not specific enough).",
+            "properties": {
+                "total": {
+                    "type": "integer",
+                    "description": "The total number of users found. If no search criteria is set, this will represent the total count of users in the database."
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "The number of users requested"
+                },
+                "first_page": {
+                    "type": "string",
+                    "description": "A relative URL to the first page of users based on limit and offset if it exists"
+                },
+                "next_page": {
+                    "type": "string",
+                    "description": "A relative URL to the next page of users based on limit and offset if it exists"
+                },
+                "previous_page": {
+                    "type": "string",
+                    "description": "A relative URL to the previous page of users based on limit and offset if it exists"
+                },
+                "last_page": {
+                    "type": "string",
+                    "description": "A relative URL to the last page of users based on limit and offset if it exists"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/usersummary"
+                    }
+                }
+            }
+        },
+        "usersummary": {
+            "type": "object",
+            "properties": {
+                "uri": {
+                    "type": "string",
+                    "description": "An href to the user resource."
+                },
+                "username": {
+                    "type": "string"
+                },
+                "email_address": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "description": "A global flag to disable/enable the account."
+                }
+            }
+        },
+        "createGroupRequest": {
+            "type": "object",
+            "properties": {
+                "group_name": {
+                    "description": "A canonical name by which this group is identified.",
+                    "type": "string"
+                },
+                "groups": {
+                    "description": "A set of existing groups that this group inherits policies from.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "policies": {
+                    "description": "The set of existing policies associated directly with this group.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "service_configurations": {
+                    "description": "The set of existing service configurations associated directly with this group.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "groupListingResponse": {
+            "type": "object",
+            "properties": {
+                "groups": {
+                    "description": "A list of existing groups.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/groupListingItem"
+                    }
+                }
+            }
+        },
+        "groupListingItem": {
+            "type": "object",
+            "properties": {
+                "group_name": {
+                    "description": "A canonical name by which this group is identified.",
+                    "type": "string"
+                },
+                "groups": {
+                    "description": "A set of groups that this group inherits policies from.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/groupListingItem"
+                    }
+                },
+                "policies": {
+                    "description": "The set of policies associated directly with this group.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/policyItem"
+                    }
+                },
+                "service_configurations": {
+                    "description": "The set of existing service configurations associated directly with this group.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/serviceConfigurationItem"
+                    }
+                }
+            }
+        },
+        "policyListingResponse": {
+            "type": "object",
+            "properties": {
+                "policies": {
+                    "description": "A list of all existing policies.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/policyItem"
+                    }
+                }
+            }
+        },
+        "policyItem": {
+            "type": "object",
+            "properties": {
+                "policy_id": {
+                    "type": "string"
+                },
+                "policy_pattern": {
+                    "type": "string"
+                },
+                "policy_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "serviceConfigurationListingResponse": {
+            "type": "object",
+            "properties": {
+                "service_configurations": {
+                    "description": "A list of all existing service configurations.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/serviceConfigurationItem"
+                    }
+                }
+            }
+        },
+        "serviceConfigurationItem": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "service_name": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "object"
+                }
+            }
+        },
+        "tenantDefinition": {
+            "type": "object",
+            "properties": {
+                "tenant_name": {
+                    "description": "The name of a tenant",
+                    "type": "string"
+                },
+                "group_domain": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "service_configurations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "roleDefinition": {
+            "type": "object",
+            "properties": {
+                "role_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "roleListingResponse": {
+            "type": "object",
+            "properties": {
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/roleDefinition"
+                    }
+                }
+            }
+        },
+        "creditHistory": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/creditEntry"
+            }
+        },
+        "creditEntry": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "number",
+                    "description": "value of this transaction"
+                },
+                "filed_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "date of the transaction"
+                },
+                "billing_transaction_id": {
+                    "type": "string",
+                    "description": "reference id provided by billing"
+                }
+            }
+        },
+        "creditBalanceResponse": {
+            "type": "object",
+            "properties": {
+                "credit_balance": {
+                    "type": "number",
+                    "description": "The current sum of all transactions"
+                }
+            }
+        },
+        "error": {
+            "type": "object",
+            "description": "Describes an error object.",
+            "required": [
+                "code",
+                "message"
+            ],
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "description": "The HTTP status code."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "A humanly readable error message."
+                },
+                "additional_details": {
+                    "type": "object",
+                    "description": "Additional details about the error."
+                }
+            }
+        },
+        "lockOutRequest": {
+            "type": "object",
+            "properties": {
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "lock_out": {
+                    "type": "boolean",
+                    "description": "true to lock.  false to unlock."
+                },
+                "reason": {
+                    "type": "string",
+                    "description": "reason why user is being locked out"
+                }
+            }
+        },
+        "lockOutInformation": {
+            "type": "object",
+            "properties": {
+                "service_name": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string",
+                    "description": "reason why user is locked out"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "when user was locked out"
+                }
+            }
+        },
+        "authResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string",
+                    "description": "the jwt"
+                },
+                "expires_in": {
+                    "type": "number",
+                    "description": "the lifetime in seconds of the access token"
+                }
+            }
+        },
+        "serviceAccessRequest": {
+            "type": "object",
+            "properties": {
+                "access_level": {
+                    "$ref": "#/definitions/accessLevelEnum"
+                },
+                "service_properties": {
+                    "type": "object"
+                }
+            }
+        },
+        "serviceAccessDescriptor": {
+            "type": "object",
+            "properties": {
+                "service_name": {
+                    "type": "string"
+                },
+                "access_level": {
+                    "$ref": "#/definitions/accessLevelEnum"
+                },
+                "service_properties": {
+                    "type": "object"
+                }
+            }
+        },
+        "serviceAccessDescriptorListing": {
+            "type": "object",
+            "properties": {
+                "service_access_descriptors": {
+                    "description": "A list of service access descriptors for the tenant.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/serviceAccessDescriptor"
+                    }
+                }
+            }
+        },
+        "accessLevelEnum": {
+            "type": "string",
+            "enum": [
+                "enabled_read",
+                "enabled_write",
+                "enabled_use",
+                "disabled"
+            ]
+        }
+    }
+}
