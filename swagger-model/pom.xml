@@ -39,7 +39,7 @@
 						</goals>
 						<configuration>
 							<artifactId>dataservices-client-swagger-model-users</artifactId>
-							<inputSpec>${swagger.baseurl}/users/swagger.json</inputSpec>
+							<inputSpec>${project.basedir}/users-swagger.json</inputSpec>
 							<modelPackage>com.quadient.dataservices.users.model</modelPackage>
 							<invokerPackage>com.quadient.dataservices.users.invoker</invokerPackage>
 						</configuration>
