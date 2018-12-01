@@ -3,6 +3,7 @@ package com.quadient.dataservices.impl;
 import javax.ws.rs.client.ClientBuilder;
 
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.quadient.dataservices.address.invoker.JSON;
@@ -20,7 +21,7 @@ public class JerseyClient extends JerseyServiceCaller implements Client {
         assert objectMapper != null;
         final JacksonJaxbJsonProvider jacksonJsonProvider =
                 new JacksonJaxbJsonProvider(objectMapper, JacksonJaxbJsonProvider.DEFAULT_ANNOTATIONS);
-        return ClientBuilder.newBuilder().register(jacksonJsonProvider);
+        return ClientBuilder.newBuilder().register(jacksonJsonProvider).register(MultiPartFeature.class);
     }
 
     public JerseyClient(Credentials credentials) {

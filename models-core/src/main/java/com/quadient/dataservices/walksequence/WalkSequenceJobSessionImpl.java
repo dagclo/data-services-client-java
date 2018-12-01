@@ -2,6 +2,7 @@ package com.quadient.dataservices.walksequence;
 
 import com.quadient.dataservices.walksequence.model.JobSummary;
 import com.quadient.dataservices.walksequence.model.RecordPages;
+import com.quadient.dataservices.walksequence.model.RecordTables;
 import com.quadient.dataservices.walksequence.model.Records;
 
 class WalkSequenceJobSessionImpl implements WalkSequenceJobSession {
@@ -47,5 +48,10 @@ class WalkSequenceJobSessionImpl implements WalkSequenceJobSession {
     @Override
     public Records downloadRecords(String pageId) {
         return client.downloadRecords(jobId, pageId);
+    }
+
+    @Override
+    public RecordTables getRecordTables() {
+        return client.getRecordTables(jobId);
     }
 }

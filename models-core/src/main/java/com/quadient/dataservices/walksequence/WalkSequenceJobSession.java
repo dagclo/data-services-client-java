@@ -2,6 +2,7 @@ package com.quadient.dataservices.walksequence;
 
 import com.quadient.dataservices.walksequence.model.JobSummary;
 import com.quadient.dataservices.walksequence.model.RecordPages;
+import com.quadient.dataservices.walksequence.model.RecordTables;
 import com.quadient.dataservices.walksequence.model.Records;
 
 public interface WalkSequenceJobSession {
@@ -13,6 +14,8 @@ public interface WalkSequenceJobSession {
     void run();
     
     JobSummary getJobSummary();
+    
+    RecordTables getRecordTables();
     
     RecordPages getInputRecordPages();
     
