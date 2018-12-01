@@ -1,5 +1,6 @@
 package com.quadient.dataservices.walksequence;
 
+import com.quadient.dataservices.etl.EtlServiceTable;
 import com.quadient.dataservices.walksequence.model.JobSummary;
 import com.quadient.dataservices.walksequence.model.RecordPages;
 import com.quadient.dataservices.walksequence.model.RecordTables;
@@ -14,6 +15,10 @@ public interface WalkSequenceJobSession {
     void run();
     
     JobSummary getJobSummary();
+    
+    EtlServiceTable getInputTable();
+    
+    EtlServiceTable getOutputTable();
     
     RecordTables getRecordTables();
     

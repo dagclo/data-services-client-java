@@ -22,6 +22,10 @@ public class WalkSequenceClient {
     public WalkSequenceClient(Client client) {
         this.client = client;
     }
+    
+    protected Client getClient() {
+        return client;
+    }
 
     public WalkSequenceJobSession createJob(WalkSequenceJobCreationRequest request) {
         Objects.requireNonNull(request, "Request cannot be null");
