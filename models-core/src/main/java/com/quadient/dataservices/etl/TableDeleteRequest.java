@@ -5,12 +5,12 @@ import java.util.Objects;
 
 import com.quadient.dataservices.api.Request;
 
-public class FileDeleteRequest implements Request<Map<String, Object>> {
+public class TableDeleteRequest implements Request<Map<String, Object>> {
 
-    private final String fileId;
+    private final String tableId;
 
-    public FileDeleteRequest(String fileId) {
-        this.fileId = Objects.requireNonNull(fileId);
+    public TableDeleteRequest(String tableId) {
+        this.tableId = Objects.requireNonNull(tableId);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class FileDeleteRequest implements Request<Map<String, Object>> {
 
     @Override
     public String getPath() {
-        return "/etl/v1/files/" + fileId;
+        return "/etl/v1/tables/" + tableId;
     }
 
     @Override

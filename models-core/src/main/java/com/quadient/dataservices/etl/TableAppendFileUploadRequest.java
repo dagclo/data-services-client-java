@@ -6,19 +6,21 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.quadient.dataservices.api.FormDataRequest;
-import com.quadient.dataservices.etl.model.FileInformation;
+import com.quadient.dataservices.etl.model.TableUpdateResponse;
 
-public class FileUploadRequest implements FormDataRequest<FileInformation> {
+public class TableAppendFileUploadRequest implements FormDataRequest<TableUpdateResponse> {
 
     private final File file;
+    private final String tableId;
 
-    public FileUploadRequest(File file) {
+    public TableAppendFileUploadRequest(String tableId, File file) {
+        this.tableId = Objects.requireNonNull(tableId);
         this.file = Objects.requireNonNull(file);
     }
 
     @Override
     public String getPath() {
-        return "/etl/v1/files";
+        return "/etl/v1/tables/" + tableId;
     }
 
     @Override
@@ -27,8 +29,8 @@ public class FileUploadRequest implements FormDataRequest<FileInformation> {
     }
 
     @Override
-    public Class<FileInformation> getResponseBodyClass() {
-        return FileInformation.class;
+    public Class<TableUpdateResponse> getResponseBodyClass() {
+        return TableUpdateResponse.class;
     }
 
 }

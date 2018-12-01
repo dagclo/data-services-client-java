@@ -3,6 +3,7 @@ package com.quadient.dataservices.etl;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 import com.quadient.dataservices.api.Headers;
 import com.quadient.dataservices.api.ImmutableHeaders;
@@ -13,7 +14,7 @@ public class FileDownloadRequest implements Request<InputStream> {
     private final String fileId;
 
     public FileDownloadRequest(String fileId) {
-        this.fileId = fileId;
+        this.fileId = Objects.requireNonNull(fileId);
     }
 
     @Override

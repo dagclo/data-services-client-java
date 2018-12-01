@@ -1,5 +1,7 @@
 package com.quadient.dataservices.etl;
 
+import java.util.Objects;
+
 import com.quadient.dataservices.api.Request;
 import com.quadient.dataservices.etl.model.FileInformation;
 
@@ -8,7 +10,7 @@ public class FileInformationRequest implements Request<FileInformation> {
     private final String fileId;
 
     public FileInformationRequest(String fileId) {
-        this.fileId = fileId;
+        this.fileId = Objects.requireNonNull(fileId);
     }
 
     @Override
