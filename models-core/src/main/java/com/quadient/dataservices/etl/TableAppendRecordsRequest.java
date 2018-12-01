@@ -1,5 +1,6 @@
 package com.quadient.dataservices.etl;
 
+import java.util.List;
 import java.util.Objects;
 
 import com.quadient.dataservices.api.Request;
@@ -14,6 +15,12 @@ public class TableAppendRecordsRequest implements Request<TableUpdateResponse> {
     public TableAppendRecordsRequest(String tableId, TableUpdateRequest body) {
         this.tableId = Objects.requireNonNull(tableId);
         this.body = Objects.requireNonNull(body);
+    }
+
+    public TableAppendRecordsRequest(String tableId, List<List<String>> records) {
+        this.tableId = Objects.requireNonNull(tableId);
+        this.body = new TableUpdateRequest();
+        this.body.setRecords(records);
     }
 
     @Override
