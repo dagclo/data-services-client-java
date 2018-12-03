@@ -9,6 +9,7 @@ import com.quadient.dataservices.api.SimpleRequest;
 import com.quadient.dataservices.walksequence.model.JobSummary;
 import com.quadient.dataservices.walksequence.model.JobSummaryCollection;
 import com.quadient.dataservices.walksequence.model.RecordPages;
+import com.quadient.dataservices.walksequence.model.RecordTables;
 import com.quadient.dataservices.walksequence.model.Records;
 import com.quadient.dataservices.walksequence.model.WalkSequenceJob;
 import com.quadient.dataservices.walksequence.model.WalkSequenceJobCreationRequest;
@@ -20,6 +21,10 @@ public class WalkSequenceClient {
 
     public WalkSequenceClient(Client client) {
         this.client = client;
+    }
+    
+    protected Client getClient() {
+        return client;
     }
 
     public WalkSequenceJobSession createJob(WalkSequenceJobCreationRequest request) {
@@ -87,6 +92,13 @@ public class WalkSequenceClient {
         return client.execute(req);
     }
 
+    protected RecordTables getRecordTables(String jobId) {
+        validatePathFragment(jobId);
+        final Request<RecordTables> req = SimpleRequest.get(BASE_PATH + "/jobs/" + jobId + "/records/tables",
+                getHeaders(), RecordTables.class);
+        return client.execute(req);
+    }
+
     private void validatePathFragment(String fragment) {
         Objects.requireNonNull(fragment, "Argument cannot be null");
         if (fragment.contains("/")) {
@@ -99,5 +111,4 @@ public class WalkSequenceClient {
             throw new IllegalArgumentException("Argument cannot contain question marks");
         }
     }
-
 }

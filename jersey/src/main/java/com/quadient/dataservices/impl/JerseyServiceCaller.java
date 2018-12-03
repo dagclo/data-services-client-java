@@ -1,27 +1,33 @@
 package com.quadient.dataservices.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.quadient.dataservices.api.AuthorizationHeaderProvider;
 import com.quadient.dataservices.api.Credentials;
 import com.quadient.dataservices.api.FailedResponse;
+import com.quadient.dataservices.api.FormDataRequest;
 import com.quadient.dataservices.api.HasBaseUri;
 import com.quadient.dataservices.api.Headers;
 import com.quadient.dataservices.api.ImmutableHeaders;
@@ -87,8 +93,31 @@ abstract class JerseyServiceCaller implements ServiceCaller, AuthorizationHeader
         final Client client = clientBuilder.build();
         try {
             final WebTarget webTarget = client.target(uriBuilder);
+            final Entity<?> requestEntity;
             final Object bodyObject = request.getBody();
-            final Entity<Object> requestEntity = bodyObject == null ? null : Entity.json(bodyObject);
+            if (bodyObject == null) {
+                requestEntity = null;
+            } else if (bodyObject instanceof Entity) {
+                requestEntity = (Entity<?>) bodyObject;
+            } else if (bodyObject instanceof Form) {
+                requestEntity = Entity.form((Form) bodyObject);
+            } else if (request instanceof FormDataRequest) {
+                final Map<String, Object> formData = ((FormDataRequest<?>) request).getBody();
+                final FormDataMultiPart multipart = new FormDataMultiPart();
+                for (Entry<String, Object> entry : formData.entrySet()) {
+                    final String key = entry.getKey();
+                    final Object value = entry.getValue();
+                    if (value instanceof File) {
+                        final FileDataBodyPart filePart = new FileDataBodyPart(key, (File) value);
+                        multipart.bodyPart(filePart);
+                    } else {
+                        multipart.field(key, String.valueOf(value));
+                    }
+                }
+                requestEntity = Entity.entity(multipart, multipart.getMediaType());
+            } else {
+                requestEntity = Entity.json(bodyObject);
+            }
             final Builder requestBuilder;
             final Headers headers = request.getHeaders();
             if (headers.getValue(HEADER_CONTENT_TYPE) == null) {

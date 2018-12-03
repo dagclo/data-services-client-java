@@ -1,0 +1,490 @@
+swagger: '2.0'
+info:
+  version: "1.0"
+  title: ETL service
+  description: |
+    The Extract, Transform Load (ETL) service handles data representation changes
+    before or after applying Quadient Data Services that process the data.
+    
+    The service aids in dealing with files and tables and transformations between the two. Usually, a data
+    service is able to consume table data with certain schema requirements. The ETL service enables a user to
+    upload a file and have it transformed into a shape that is consumeable by the service.
+paths:
+  /etl/v1/files:
+    post:
+      summary: Upload file
+      description: Uploads a file to inspect and handle using the service.
+      consumes:
+      - multipart/form-data
+      parameters:
+      - in: formData
+        name: upfile
+        type: file
+        required: true
+        description: The file to upload.
+      responses:
+        200:
+          description: Successful response.
+          schema:
+            $ref: '#/definitions/FileInformation'
+        400:
+          description: The request is invalid because a required element is missing or empty.
+          schema:
+            $ref: '#/definitions/error'
+  /etl/v1/files/{file_id}:
+    parameters:
+    - name: file_id
+      in: path
+      required: true
+      type: string
+    get:
+      summary: Get file information
+      responses:
+        '200':
+          description: File found.
+          schema:
+            $ref: '#/definitions/FileInformation'
+        '404':
+          description: File not found.
+    delete:
+      summary: Delete file
+      responses:
+        '200':
+          description: File deleted.
+        '404':
+          description: File not found.
+  /etl/v1/files/{file_id}/_query:
+    parameters:
+    - name: file_id
+      in: path
+      required: true
+      type: string
+    post:
+      summary: Query the data of a file
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/QueryRequest'
+      responses:
+        200:
+          description: Successful response.
+          schema:
+            $ref: '#/definitions/QueryResponse'
+        400:
+          description: The request is invalid because a required element is missing or empty.
+          schema:
+            $ref: '#/definitions/error'
+  /etl/v1/files/{file_id}/_transform:
+    parameters:
+    - name: file_id
+      in: path
+      required: true
+      type: string
+    post:
+      summary: Transform the file into a structured table
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/TransformRequest'
+      responses:
+        200:
+          description: Successful response.
+          schema:
+            $ref: '#/definitions/TransformResponse'
+        400:
+          description: The request is invalid request because a required element is missing or empty.
+          schema:
+            $ref: '#/definitions/error'
+  /etl/v1/files/{file_id}/_download:
+    parameters:
+    - name: file_id
+      in: path
+      required: true
+      type: string
+    get:
+      summary: Download the file in it's original/binary format
+      produces:
+      - application/octet-stream
+      responses:
+        200:
+          description: Successful response.
+          schema:
+            type: file
+        400:
+          description: The request is invalid request because a required element is missing or empty.
+          schema:
+            $ref: '#/definitions/error'
+  /etl/v1/tables:
+    post:
+      summary: Create table, either by defining its schema or by upload file to create table
+      description: |
+        Takes either a `TableCreationRequest` as an `application/json` payload, or
+        uploads a file and directly creates a table from it. This endpoint is equivalent to calling POST
+        to `/etl/v1/files` followed by a `_transform` call on the resulting file resource. This transforms
+        the first table of the file and maps every src column to a new destination column of the same name.
+      consumes:
+      - application/json
+      - multipart/form-data
+      parameters:
+      - in: body
+        name: body
+        $ref: '#/definitions/TableCreationRequest'
+        required: false
+        description: The table creation request.
+      - in: formData
+        name: upfile
+        type: file
+        required: false
+        description: The file to upload.
+      responses:
+        200:
+          description: Successful response.
+          schema:
+            $ref: '#/definitions/TableInformation'
+        400:
+          description: The request is invalid request because a required element is missing or empty.
+          schema:
+            $ref: '#/definitions/error'
+  /etl/v1/tables/{table_id}:
+    parameters:
+    - name: table_id
+      in: path
+      required: true
+      type: string
+    get:
+      summary: Get table information
+      responses:
+        '200':
+          description: Table found.
+          schema:
+            $ref: '#/definitions/TableInformation'
+        '404':
+          description: Table not found.
+    post:
+      summary: |
+        Post updates or data additions to a table.
+        Takes either a `TableUpdateRequest` as an `application/json` payload, or
+        uploads a file in order to append data to it.
+      consumes:
+      - application/json
+      - multipart/form-data
+      parameters:
+      - name: body
+        in: body
+        required: false
+        schema:
+          $ref: '#/definitions/TableUpdateRequest'
+      - in: formData
+        name: upfile
+        type: file
+        required: false
+        description: The file to upload.
+      responses:
+        '200':
+          description: Updates accepted
+          schema:
+            $ref: '#/definitions/TableUpdateResponse'
+        '404':
+          description: Table not found.
+    delete:
+      summary: Delete table
+      responses:
+        '200':
+          description: Table deleted.
+        '404':
+          description: Table not found.
+  /etl/v1/tables/{table_id}/_csv:
+    parameters:
+    - name: table_id
+      in: path
+      required: true
+      type: string
+    - name: includeHeader
+      in: query
+      required: false
+      default: false
+      type: boolean
+      description: Whether or not to include a header line with the column names.
+    - name: preserveOrder
+      in: query
+      required: false
+      default: false
+      type: boolean
+      description: Whether or not record order has to be preserved.
+    - name: separator
+      in: query
+      required: false
+      default: ','
+      type: string
+      description: The CSV separator character to use (typically comma or semicolon)
+    - name: quote
+      in: query
+      required: false
+      default: '"'
+      type: string
+      description: The CSV quote character to use (typically double-quote)
+    - name: escape
+      in: query
+      required: false
+      default: '\'
+      type: string
+      description: The CSV escape character to use (typically backslash)
+    get:
+      summary: Download the table data in CSV format
+      produces:
+      - text/csv
+      responses:
+        '200':
+          description: Table found.
+          schema:
+            type: file
+        '404':
+          description: Table not found.
+  /etl/v1/tables/{table_id}/{page_id}:
+    parameters:
+    - name: table_id
+      in: path
+      required: true
+      type: string
+    - name: page_id
+      in: path
+      required: true
+      type: string
+    get:
+      summary: Get a page of data from a table
+      responses:
+        '200':
+          description: Table and page found.
+          schema:
+            $ref: '#/definitions/TablePage'
+        '404':
+          description: Table or page not found.
+    delete:
+      summary: Delete a page of data from a table
+      responses:
+        '200':
+          description: Page deleted.
+        '404':
+          description: Table or page not found.
+definitions:
+  TableInformation:
+    type: object
+    properties:
+      uri:
+        type: string
+      table_id:
+        type: string
+      column_names:
+        type: array
+        items:
+          type: string
+      page_ids:
+        type: array
+        description: A list of page IDs for this table. Each page contains a block of records.
+        items:
+          type: string
+  TablePage:
+    type: object
+    properties:
+      records:
+        type: array
+        items:
+          type: array
+          items:
+            type: string
+  TableCreationRequest:
+    type: object
+    properties:
+      column_names:
+        type: array
+        items:
+          type: string
+  TableUpdateRequest:
+    type: object
+    properties:
+      records:
+        type: array
+        items:
+          type: array
+          items:
+            type: string
+  TableUpdateResponse:
+    type: object
+    properties:
+      updated:
+        type: boolean
+      new_page_ids:
+        type: array
+        description: A list of newly added page IDs for the table.
+        items:
+          type: string
+  FileInformation:
+    type: object
+    description: Response to uploading a file.
+    properties:
+      file_id:
+        type: string
+        description: The ID that has been assigned to the uploaded file.
+        example: k4jh23kj4h2342
+      uri:
+        type: string
+        description: The URI to where this file is represented.
+        example: "/etl/files/v1/k4jh23kj4h2342"
+      file_type:
+        type: string
+        description: The file type of the uploaded file.
+        enum:
+        - csv
+        - excel
+      tables:
+        type: array
+        description: Tables of data that were found.
+        items:
+          $ref: '#/definitions/FileTableItem'
+  FileTableItem:
+    type: object
+    properties:
+      index:
+        type: integer
+        format: int32
+        description: A zero-based index of the table. Needed as a way to reference the table for data transformations.
+      name:
+        type: string
+      columns:
+        description: Provides a list of the columns found in the table.
+        type: array
+        items:
+          $ref: '#/definitions/FileColumnItem'
+      sample_records:
+        description: |
+          Provides a sample set of records (up to five). These sample records are provided for convenience
+          when displaying data back to the user. If more records are needed, use the query endpoint instead.
+        type: array
+        items:
+          type: array
+          items:
+            type: string
+  FileColumnItem:
+    type: object
+    properties:
+      index:
+        type: integer
+        format: int32
+        description: A zero-based index of the column. Needed as a way to reference the column for data transformations.
+      name:
+        type: string
+        description: The name of the column in the file.
+      suggested_field:
+        type: string
+        description: A suggested field mapping against common Quadient Data Services fields.
+        enum:
+        - given_name
+        - middle_name
+        - family_name
+        - full_name
+        - organization
+        - email_address
+        - phone_number
+        - country
+        - county
+        - province_or_state
+        - postal_code
+        - city
+        - address_line
+  QueryRequest:
+    type: object
+    required:
+    - table_index
+    properties:
+      table_index:
+        type: integer
+        format: int32
+        description: The table index to query. 
+      limit:
+        type: integer
+        format: int32
+        description: The maximum number of records to return.
+        example: 100
+        default: 1000
+        maximum: 10000
+      offset:
+        type: integer
+        format: int32
+        description: The first record (1-based) to return.
+        example: 101
+  QueryResponse:
+    type: object
+    properties:
+      end_of_table:
+        type: boolean
+        description: A boolean determining whether or not more records exist in the file.
+      records:
+        type: array
+        items:
+          type: array
+          items:
+            type: string
+  TransformRequest:
+    type: object
+    required:
+    - src_table_index
+    - dest_table_schema
+    properties:
+      limit:
+        type: integer
+        format: int32
+        description: Optional. A limit to the number of records to transform or copy to the new table.
+      delete_after_transform:
+        type: boolean
+        default: false
+        description: Optional. A boolean that can be set to `true` to delete the file after a successful transformation.
+      src_table_index:
+        type: integer
+        format: int32
+        description: The table index to transform.
+      dest_table_schema:
+        type: array
+        items:
+          $ref: '#/definitions/TransformColumnMapping'
+  TransformColumnMapping:
+    type: object
+    required:
+    - src_column_index
+    - dest_column_name
+    properties:
+      src_column_index:
+        type: integer
+        format: int32
+        description: The column index to transform.
+      dest_column_name:
+        type: string
+        description: The name of the column in the newly created table.
+  TransformResponse:
+    type: object
+    allOf:
+    - $ref: '#/definitions/TableInformation'
+  error:
+    type: object
+    description: Describes an error object.
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        description: The HTTP status code.
+      message:
+        type: string
+        description: A human-readable error message.
+      additional_details:
+        type: object
+        description: Additional details about the error.
+    example:
+      code: 400
+      message: Bad request
+      additional_details:
+        reason: Required element not specified

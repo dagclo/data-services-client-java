@@ -57,6 +57,18 @@
 						</configuration>
 					</execution>
 					<execution>
+						<id>generate-model-etl</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<artifactId>dataservices-client-swagger-model-etl</artifactId>
+							<inputSpec>${project.basedir}/etl-swagger.yaml</inputSpec>
+							<modelPackage>com.quadient.dataservices.etl.model</modelPackage>
+							<invokerPackage>com.quadient.dataservices.etl.invoker</invokerPackage>
+						</configuration>
+					</execution>
+					<execution>
 						<id>generate-model-country</id>
 						<goals>
 							<goal>generate</goal>

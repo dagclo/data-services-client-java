@@ -12,7 +12,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<jackson.version>2.9.5</jackson.version>
+		<jackson.version>2.9.7</jackson.version>
 		<jersey.version>2.27</jersey.version>
 		<slf4j.version>1.7.25</slf4j.version>
 	</properties>
@@ -201,6 +201,11 @@
 				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.fasterxml.jackson.module</groupId>
+				<artifactId>jackson-module-jaxb-annotations</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>javax.validation</groupId>
 				<artifactId>validation-api</artifactId>
 				<version>2.0.1.Final</version>
@@ -239,6 +244,11 @@
 				<groupId>com.brsanthu</groupId>
 				<artifactId>migbase64</artifactId>
 				<version>2.2</version>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.12</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
