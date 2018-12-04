@@ -32,18 +32,18 @@ class EtlServiceTableImpl implements EtlServiceTable {
     @Override
     public List<String> getColumnNames() {
         if (tableColumns == null) {
-            tableColumns = getTableInformation().getColumnNames();
+            tableColumns = getTableInformation(true, false).getColumnNames();
         }
         return tableColumns;
     }
 
     @Override
     public List<String> getPageIds() {
-        return getTableInformation().getPageIds();
+        return getTableInformation(false, true).getPageIds();
     }
 
-    private TableInformation getTableInformation() {
-        return client.execute(new TableInformationRequest(tableId));
+    private TableInformation getTableInformation(boolean retrieveColumns, boolean retrievePages) {
+        return client.execute(new TableInformationRequest(tableId, retrieveColumns, retrievePages));
     }
 
     @Override

@@ -8,9 +8,17 @@ import com.quadient.dataservices.etl.model.TableInformation;
 public class TableInformationRequest implements Request<TableInformation> {
 
     private final String tableId;
+    private final boolean retrieveColumns;
+    private final boolean retrievePages;
 
     public TableInformationRequest(String tableId) {
+        this(tableId, true, true);
+    }
+
+    public TableInformationRequest(String tableId, boolean retrieveColumns, boolean retrievePages) {
         this.tableId = Objects.requireNonNull(tableId);
+        this.retrieveColumns = retrieveColumns;
+        this.retrievePages = retrievePages;
     }
 
     @Override
@@ -20,7 +28,7 @@ public class TableInformationRequest implements Request<TableInformation> {
 
     @Override
     public String getPath() {
-        return "/etl/v1/tables/" + tableId;
+        return "/etl/v1/tables/" + tableId + "?retrieveColumns=" + retrieveColumns + "&retrievePages=" + retrievePages;
     }
 
     @Override
