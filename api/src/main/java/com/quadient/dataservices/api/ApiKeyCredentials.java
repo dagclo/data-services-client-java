@@ -37,9 +37,14 @@ public class ApiKeyCredentials implements Credentials, HasBaseUri, Authorization
     public char[] getApiSecret() {
         return apiSecret;
     }
+    
+    @Override
+    public Credentials getCredentials() {
+        return this;
+    }
 
     @Override
-    public String getAuthorizationHeader() {
+    public String getAuthorizationHeader(boolean forceRenewedToken) {
         final StringBuilder authBuilder = new StringBuilder();
         authBuilder.append(apiKey);
         authBuilder.append(':');

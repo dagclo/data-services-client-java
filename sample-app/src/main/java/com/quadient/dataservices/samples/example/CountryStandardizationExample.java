@@ -1,6 +1,7 @@
 package com.quadient.dataservices.samples.example;
 
 import com.quadient.dataservices.ClientFactory;
+import com.quadient.dataservices.api.AuthenticatedUser;
 import com.quadient.dataservices.api.Client;
 import com.quadient.dataservices.api.Credentials;
 import com.quadient.dataservices.api.JobSession;
@@ -14,6 +15,13 @@ public class CountryStandardizationExample {
         final Credentials credentials = CommandLineArgs.getCredentials(args);
 
         final Client client = ClientFactory.createClient(credentials);
+        
+        System.out.println("Authenticated User:");
+        final AuthenticatedUser authenticatedUser = client.getAuthenticatedUser();
+        System.out.println(" - User ID: " + authenticatedUser.getUserId());
+        System.out.println(" - Credit balance: " + authenticatedUser.getCreditBalance());
+        
+        authenticatedUser.validateCredentials();
         
         CountryStandardizationResponse response;
 

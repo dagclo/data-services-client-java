@@ -72,8 +72,13 @@ abstract class JerseyServiceCaller implements ServiceCaller, AuthorizationHeader
     }
 
     @Override
-    public String getAuthorizationHeader() {
-        return authoritzationHeaderProvider.getAuthorizationHeader();
+    public String getAuthorizationHeader(boolean forceRenewedToken) {
+        return authoritzationHeaderProvider.getAuthorizationHeader(forceRenewedToken);
+    }
+    
+    @Override
+    public Credentials getCredentials() {
+        return authoritzationHeaderProvider.getCredentials();
     }
 
     @Override
@@ -130,7 +135,7 @@ abstract class JerseyServiceCaller implements ServiceCaller, AuthorizationHeader
                 requestBuilder.header(key, headers.getValue(key));
             }
             if (!keys.contains(HEADER_AUTHORIZATION)) {
-                requestBuilder.header(HEADER_AUTHORIZATION, getAuthorizationHeader());
+                requestBuilder.header(HEADER_AUTHORIZATION, getAuthorizationHeader(false));
             }
             interceptRequestBefore(requestBuilder);
 
@@ -251,7 +256,7 @@ abstract class JerseyServiceCaller implements ServiceCaller, AuthorizationHeader
         return clientBuilder;
     }
 
-    protected AuthorizationHeaderProviderImpl getAccessTokenProvider() {
+    protected AuthorizationHeaderProviderImpl getAuthorizationHeaderProvider() {
         return authoritzationHeaderProvider;
     }
 }

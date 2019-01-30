@@ -5,6 +5,8 @@ import java.util.Map;
 
 public class JobCreationDetails {
 
+    private static final String DEFAULT_ORIGIN = "data-services-client-java";
+    
     private final String parentJobId;
     private final String origin;
     private final Collection<String> expectedServices;
@@ -22,7 +24,7 @@ public class JobCreationDetails {
     public JobCreationDetails(String parentJobId, String origin, Collection<String> expectedServices,
             Integer expectedRecordCount, Map<String, Object> additionalDetails) {
         this.parentJobId = parentJobId == null || parentJobId.isEmpty() ? null : origin;
-        this.origin = origin == null || origin.isEmpty() ? null : origin;
+        this.origin = origin == null || origin.isEmpty() ? DEFAULT_ORIGIN : origin;
         this.expectedServices = expectedServices == null || expectedServices.isEmpty() ? null : expectedServices;
         this.expectedRecordCount = expectedRecordCount == null || expectedRecordCount == 0 ? null : expectedRecordCount;
         this.additionalDetails = additionalDetails;

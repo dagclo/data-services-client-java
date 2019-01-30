@@ -8,6 +8,12 @@ import com.quadient.dataservices.exceptions.DataServicesException;
  * Represents a client of Quadient Data Services
  */
 public interface Client extends ServiceCaller {
+    
+    /**
+     * Gets information about the currently authenticated user.
+     * @return
+     */
+    AuthenticatedUser getAuthenticatedUser();
 
     /**
      * Creates a job in Quadient Data Services.

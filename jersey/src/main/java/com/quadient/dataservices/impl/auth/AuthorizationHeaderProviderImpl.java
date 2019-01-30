@@ -65,12 +65,12 @@ public final class AuthorizationHeaderProviderImpl implements AuthorizationHeade
     }
 
     @Override
-    public String getAuthorizationHeader() {
+    public String getAuthorizationHeader(boolean forceRenewedToken) {
         if (credentials instanceof AuthorizationHeaderProvider) {
-            return ((AuthorizationHeaderProvider) credentials).getAuthorizationHeader();
+            return ((AuthorizationHeaderProvider) credentials).getAuthorizationHeader(forceRenewedToken);
         }
 
-        if (latestTokenIssueTimestamp + TOKEN_EXPIRATION_MS < System.currentTimeMillis()) {
+        if (forceRenewedToken || latestTokenIssueTimestamp + TOKEN_EXPIRATION_MS < System.currentTimeMillis()) {
             final String token;
             if (credentials instanceof QuadientCloudCredentials) {
                 final QuadientCloudCredentials usernamePasswordCredentials = (QuadientCloudCredentials) credentials;
@@ -163,5 +163,10 @@ public final class AuthorizationHeaderProviderImpl implements AuthorizationHeade
         } finally {
             client.close();
         }
+    }
+
+    @Override
+    public Credentials getCredentials() {
+        return credentials;
     }
 }
