@@ -170,6 +170,17 @@ definitions:
         type: string
       family_name:
         type: string
+  MatchResponsePhoneNumber:
+    type: object
+    properties:
+      phone_number:
+        type: string
+        description: |
+          The phone number associated with the record in question.
+        example: "+41446681800"
+      phone_type:
+        type: string
+        description: The phone type associated with the phone number provided.
   MatchRequestAddress:
     type: object
     allOf:
@@ -291,11 +302,11 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/MatchResponseAddress'
-      phone_number:
+      phone_numbers:
         type: array
         items:
-          type: string
-      email_address:
+          $ref: '#/definitions/MatchResponsePhoneNumber'
+      email_addresses:
         type: array
         items:
           type: string
@@ -415,6 +426,7 @@ definitions:
     - EU_EEAS
     - US_OFAC
     - TEST
+    - PEP
   EntityType:
     type: string
     enum:
