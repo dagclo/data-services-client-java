@@ -49,6 +49,7 @@ public class SanctionListsPerformanceTest extends AbstractPerformanceTest {
             "https://raw.githubusercontent.com/datacleaner/DataCleaner/master/desktop/ui/src/main/resources/datacleaner-home/datastores/customers.csv";
 
     public static void main(String[] args) throws IOException {
+        
         final Credentials credentials = CommandLineArgs.getCredentials(args);
         final Client client = ClientFactory.createClient(credentials);
 

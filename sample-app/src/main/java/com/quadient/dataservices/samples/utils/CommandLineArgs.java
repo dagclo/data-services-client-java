@@ -8,8 +8,20 @@ import com.quadient.dataservices.api.HasBaseUri;
 import com.quadient.dataservices.api.PreAuthorizedCredentials;
 import com.quadient.dataservices.api.QuadientCloudCredentials;
 import com.quadient.dataservices.api.Region;
+import picocli.CommandLine.Option;
 
 public class CommandLineArgs {
+
+    @Option(names = { "-u", "--username" }, description = "system username")
+    public String userName;
+
+    @Option(names= {"-p", "--password"}, description = "password to use")
+    public String password;
+
+    @Option(names = {"-c", "--company"} , description = "quadient cloud company")
+    public String company;
+
+    
 
     public static Credentials getCredentials(String[] args) {
         if (args.length == 4) {
