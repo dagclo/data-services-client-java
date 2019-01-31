@@ -22,6 +22,8 @@ import org.apache.metamodel.data.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import picocli.CommandLine;
+
 import com.google.common.base.Strings;
 import com.quadient.dataservices.ClientFactory;
 import com.quadient.dataservices.api.Client;
@@ -50,11 +52,19 @@ public class SanctionListsPerformanceTest extends AbstractPerformanceTest {
 
     public static void main(String[] args) throws IOException {
         
-        final Credentials credentials = CommandLineArgs.getCredentials(args);
+        final CommandLineArgs cmdLineArgs = new CommandLineArgs();
+        new CommandLine(cmdLineArgs).parse(args);
+        Credentials credentials;
+        if(cmdLineArgs.isValid()){
+            credentials = cmdLineArgs.getCredentials();
+        } else{
+            credentials = CommandLineArgs.getCredentials(cmdLineArgs.PositionalArguments);
+        }
+
         final Client client = ClientFactory.createClient(credentials);
 
         final int numThreads = 2;
-        final boolean createJob = true;
+        final boolean createJob = cmdLineArgs.isValid() ? cmdLineArgs.createJob : true;
         final int numRequests = 100;
         final int numRecordsPerRequest = 50;
 

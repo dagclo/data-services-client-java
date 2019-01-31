@@ -9,6 +9,7 @@ import com.quadient.dataservices.api.PreAuthorizedCredentials;
 import com.quadient.dataservices.api.QuadientCloudCredentials;
 import com.quadient.dataservices.api.Region;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 public class CommandLineArgs {
 
@@ -21,7 +22,50 @@ public class CommandLineArgs {
     @Option(names = {"-c", "--company"} , description = "quadient cloud company")
     public String company;
 
-    
+    @Option(names = {"-cj", "--create-job"}, description = "decide whether or not to create job while running", defaultValue = "true")
+    public Boolean createJob;
+
+    @Option(names = {"--url"}, description = "target url. overrides region")
+    public String url;
+
+    @Option(names = {"-r", "--region"}, description = "which quadient cloud region to use.")
+    public String region;
+
+    @Option(names = { "-at", "--access-token"})
+    public String accessToken;
+
+    @Parameters(index = "0..*") public String[] PositionalArguments;
+
+    public boolean isValid(){
+        return url != null;
+    }
+
+    public CommandLineArgs() {}
+
+    public Credentials getCredentials()
+    {
+        if(url == null && region == null) throw new IllegalArgumentException("--url or --region should be provided");
+        URI uri;
+        if(url != null){
+            uri = URI.create(url);
+        }else{
+            uri = getBaseUri(region).getBaseUri();
+        }
+
+        if(accessToken != null){
+            return new PreAuthorizedCredentials(uri, accessToken);
+        }
+
+        if(password == null && userName == null){
+            throw new IllegalArgumentException("if not providing accesstoken, username and password are required.");
+        }
+
+        if(company != null){
+            return new QuadientCloudCredentials(uri, company, userName, password.toCharArray());
+        }else{
+            return new AdministrativeCredentials(uri, userName, password.toCharArray());
+        }
+    }
 
     public static Credentials getCredentials(String[] args) {
         if (args.length == 4) {

@@ -8,6 +8,7 @@ Thumbs.db
 .vs/
 .vscode/
 *.user
+*.code-workspace
 
 # dotnet build files
 obj/
@@ -25,3 +26,4 @@ project.lock.json
 
 # maven files
 target/
+
