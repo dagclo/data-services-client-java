@@ -1,4 +1,4 @@
-package com.quadient.dataservices.samples.perftest;
+package com.quadient.dataservices.samples.perftest.sanctionlistcheck;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import org.apache.metamodel.csv.CsvConfiguration;
 import org.apache.metamodel.csv.CsvDataContext;
@@ -29,14 +30,18 @@ import com.quadient.dataservices.ClientFactory;
 import com.quadient.dataservices.api.Client;
 import com.quadient.dataservices.api.Credentials;
 import com.quadient.dataservices.api.Request;
+import com.quadient.dataservices.samples.perftest.AbstractPerformanceTest;
+import com.quadient.dataservices.samples.perftest.PerformanceTestState;
 import com.quadient.dataservices.samples.utils.CommandLineArgs;
 import com.quadient.dataservices.sanctionlists.SanctionListCheckRequest;
 import com.quadient.dataservices.sanctionlists.model.EntityType;
 import com.quadient.dataservices.sanctionlists.model.Gender;
 import com.quadient.dataservices.sanctionlists.model.MatchRequest;
 import com.quadient.dataservices.sanctionlists.model.MatchRequestAddress;
+import com.quadient.dataservices.sanctionlists.model.MatchRequestConfiguration;
 import com.quadient.dataservices.sanctionlists.model.MatchRequestName;
 import com.quadient.dataservices.sanctionlists.model.MatchRequestRecord;
+import com.quadient.dataservices.sanctionlists.model.SourceList;
 
 /**
  * Example performance test class for Email validation.
@@ -52,7 +57,7 @@ public class SanctionListsPerformanceTest extends AbstractPerformanceTest {
 
     public static void main(String[] args) throws IOException {
         
-        final CommandLineArgs cmdLineArgs = new CommandLineArgs();
+        final SanctionListCmdArgs cmdLineArgs = new SanctionListCmdArgs();
         new CommandLine(cmdLineArgs).parse(args);
         Credentials credentials;
         if(cmdLineArgs.isValid()){
@@ -67,9 +72,11 @@ public class SanctionListsPerformanceTest extends AbstractPerformanceTest {
         final boolean createJob = cmdLineArgs.isValid() ? cmdLineArgs.createJob : true;
         final int numRequests = 100;
         final int numRecordsPerRequest = 50;
+        final MatchRequestConfiguration configuration = new MatchRequestConfiguration();        
+        configuration.setSourceLists( cmdLineArgs.sourceLists.stream().map(s -> SourceList.fromValue(s)).collect(Collectors.toList()));
 
         final SanctionListsPerformanceTest perfTest =
-                new SanctionListsPerformanceTest(client, numThreads, createJob, numRequests, numRecordsPerRequest);
+                new SanctionListsPerformanceTest(client, numThreads, createJob, numRequests, numRecordsPerRequest, configuration);
         final PerformanceTestState testState = perfTest.run();
 
         if (testState.isCancelled()) {
@@ -82,12 +89,14 @@ public class SanctionListsPerformanceTest extends AbstractPerformanceTest {
 
     private final int numRequests;
     private final int numRecordsPerRequest;
+    private final MatchRequestConfiguration configuration;
 
     public SanctionListsPerformanceTest(Client client, int numThreads, boolean createJob, int numRequests,
-            int numRecordsPerRequest) {
+            int numRecordsPerRequest, MatchRequestConfiguration configuration) {
         super(client, numThreads, createJob);
         this.numRequests = numRequests;
         this.numRecordsPerRequest = numRecordsPerRequest;
+        this.configuration = configuration;
     }
 
     @Override
@@ -173,6 +182,7 @@ public class SanctionListsPerformanceTest extends AbstractPerformanceTest {
 
     private Request<?> createRequest(List<MatchRequestRecord> records, Random r) {
         final MatchRequest body = new MatchRequest();
+        body.setConfiguration(this.configuration);
         for (int i = 0; i < numRecordsPerRequest; i++) {
             final int recordIndex = r.nextInt(records.size());
             logger.debug("Selected random record index: {}", recordIndex);
