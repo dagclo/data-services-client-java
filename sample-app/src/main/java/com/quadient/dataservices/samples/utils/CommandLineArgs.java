@@ -77,6 +77,8 @@ public class CommandLineArgs {
     }
 
     public static Credentials getCredentials(String[] args) {
+        if(args == null) throw new IllegalArgumentException(
+            "Please provide the following 4 command line args: <region> <company> <username> <password>");
         if (args.length == 4) {
             final HasBaseUri region = getBaseUri(args[0]);
             final String company = args[1];

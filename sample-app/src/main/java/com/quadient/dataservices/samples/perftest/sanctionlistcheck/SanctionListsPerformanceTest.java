@@ -83,8 +83,8 @@ public class SanctionListsPerformanceTest extends AbstractPerformanceTest {
             System.exit(500);
         }
 
-        logger.info("Config:\nThreads: {}\nRequests: {}\nRecords/Request: {}\nRecords total: {}", numThreads,
-                numRequests, numRecordsPerRequest, numRecordsPerRequest * numRequests);
+        logger.info("Config:\nThreads: {}\nRequests: {}\nRecords/Request: {}\nRecords total: {}\nSourceLists: {}", numThreads,
+                numRequests, numRecordsPerRequest, numRecordsPerRequest * numRequests, String.join(",", cmdLineArgs.sourceLists));
     }
 
     private final int numRequests;
