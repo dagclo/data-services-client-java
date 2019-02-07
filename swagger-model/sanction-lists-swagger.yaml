@@ -426,7 +426,6 @@ definitions:
     - EU_EEAS
     - US_OFAC
     - TEST
-    - PEP
   EntityType:
     type: string
     enum:
