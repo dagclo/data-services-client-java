@@ -68,10 +68,10 @@ public class SanctionListsPerformanceTest extends AbstractPerformanceTest {
 
         final Client client = ClientFactory.createClient(credentials);
 
-        final int numThreads = 2;
+        final int numThreads = cmdLineArgs.numThreads;
         final boolean createJob = cmdLineArgs.isValid() ? cmdLineArgs.createJob : true;
-        final int numRequests = 100;
-        final int numRecordsPerRequest = 50;
+        final int numRequests = cmdLineArgs.numRequests;
+        final int numRecordsPerRequest = cmdLineArgs.numRecordsPerRequest;
         final MatchRequestConfiguration configuration = new MatchRequestConfiguration();        
         configuration.setSourceLists( cmdLineArgs.sourceLists.stream().map(s -> SourceList.fromValue(s)).collect(Collectors.toList()));
 

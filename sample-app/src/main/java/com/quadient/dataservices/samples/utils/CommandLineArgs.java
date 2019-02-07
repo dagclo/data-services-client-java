@@ -34,6 +34,15 @@ public class CommandLineArgs {
     @Option(names = { "-at", "--access-token"})
     public String accessToken;
 
+    @Option(names = { "-tc", "--number-of-threads"}, defaultValue = "2")
+    public int numThreads;
+
+    @Option(names = { "-rpr", "--number-of-records-per-request"}, defaultValue = "50")
+    public int numRecordsPerRequest;
+
+    @Option(names = { "-rc", "--number-of-requests"}, defaultValue = "100")
+    public int numRequests;
+
     @Parameters(index = "0..*") public String[] PositionalArguments;
 
     public boolean isValid(){
